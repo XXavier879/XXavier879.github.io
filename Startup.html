@@ -1,0 +1,78 @@
+<html>
+<div></div>
+</  html ><html>
+    <head>
+        <title>XGames server</title>
+        <link rel="shortcut icon" type="image/png" href="http://localhost:26543/storage/emulated/0/coding/proyecto+XGames/textures/XXavier879.ico">
+        <link rel="stylesheet" href="http://localhost:26543/storage/emulated/0/coding/proyecto+XGames/fake+minecraft/css/start screen.css">
+    </head>
+    <body>
+    <div class="search-container">
+        <input id="input-search" type="search" onkeypress="return keyScriptInputSearch(event)" minlength="1" maxlength="500">
+    </div>
+    <div class="search-container">
+        <input id="custom-webpage-loader" type="search" onkeypress="return keyScriptcustomSearch(event)" minlength="1" maxlength="500">
+    </div>
+    <script type="text/javascript">
+        function validURL(str) {
+            var pattern = new RegExp(
+                '^(https?:\\/\\/)?' + // protocol
+                '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+                '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+                '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+                '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+                '(\\#[-a-z\\d_]*)?$',
+                'i',
+            ) // fragment locator
+            return !!pattern.test(str)
+        }
+
+        function goSearch() {
+            var searchValue = document.getElementById('input-search').value
+            if (validURL(searchValue)) {
+                if (
+                    searchValue.startsWith('https://') ||
+                    searchValue.startsWith('http://')
+                ) {
+                    window.location.href = searchValue
+                } else {
+                    window.location.href = 'http://' + searchValue
+                }
+            } else {
+                var engineUrl = Client.getSearchEngineUrl().replace('%s', '')
+                window.location.href = engineUrl + searchValue
+            }
+        }
+
+        function keyScriptInputSearch(e) {
+            if (e.keyCode === 13) {
+                goSearch()
+                return false
+            }
+        }
+
+        function gocustomSearch() {
+            var searchValue = document.getElementById('input-search').value
+            if (validURL(searchValue)) {
+                if (
+                    searchValue.startsWith('www.')
+                ) {
+                    window.location.href = 'http://localhost:26543/storage/emulated/0/coding/searcher/custom_web/' +searchValue + '.html'
+                } else {
+                    window.location.href = 'http://localhost:26543/storage/emulated/0/coding/searcher/search=' + searchValue + '.html'
+                }
+            } else {
+                window.location.href = 'http://localhost:26543/storage/emulated/0/coding/searcher/search=' + searchValue + '.html'
+            }
+        }
+
+        function keyScriptcustomSearch(e) {
+            if (e.keyCode === 13) {
+                gocustomSearch()
+                return false
+            }
+        }
+    </script>
+    <iframe class="XGames-Web-screen" src="http://localhost:26543/storage/emulated/0/coding/proyecto+XGames/html+test.html" frameborder="10"></iframe>
+    </body>
+</html>
