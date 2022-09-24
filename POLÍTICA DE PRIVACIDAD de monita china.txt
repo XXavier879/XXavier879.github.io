@@ -1,0 +1,2 @@
+Monita china no recopila datos solo es un bot que cuando dices algo responde con algo como por ejemplo: "Hola monita china" y respondera:"hola" no hace mas.
+Es como una decoracion
