@@ -1,101 +1,85 @@
 * {
-
     margin:0;
-
     padding:0;
-
 }
 
-font-face {
-
-    font-family: maincra;
-
-    src: url('fonts/Minecraft-Seven-29cc6.otf'); 
-
-    }
-
-div {
-
-    height:192;
-
-    width:192;
-
-    background:#c6c6c6;
-
-    border-top-color:#f7f7f7;
-
-    border-right-color:#656465;
-
-    border-left-color:#f7f7f7;
-
-    border-bottom-color:#656465;
-
-    border:10px;
-
-    font-palette:#000000;
-
-    font:url(../fonts/Minecraft-Ten-b8f2d.otf);
-
-    background:url(../textures/dark_metal_block.png);
-
+@font-face {
+    font-family: mctitle;
+    src: url('fonts/Minecraft-Ten.otf'); 
+}
+@font-face {
+    font-family: mcnormal;
+    src: url('fonts/Minecraft-Seven.otf'); 
+}
+@font-face {
+    font-family: mcsmall;
+    src: url('fonts/Minecraft-Five.otf'); 
+}@font-face {
+    font-family: mcsmalltick;
+    src: url('fonts/Minecraft-Five-Bold.otf'); 
 }
 
-div2 {
-
-    height:32;
-
-    width:32;
-
-    background:#c6c6c6;
-
-    border-top-color:#f7f7f7;
-
-    border-right-color:#656465;
-
-    border-left-color:#f7f7f7;
-
-    border-bottom-color:#656465;
-
-    border:10px;
-
-    font-palette:#000000;
-
-    background:url(../textures/diamond_block.png);
-
+#log {
+    font-family: mcnormal;
 }
 
-.div2 {
+.log-message.error {
+    color: #ff8080;
+    background-color: #290000;
+}
 
-    width:192;
+.log-message.warn {
+    color: #ffcb6b;
+    background-color: #332a00;
+}
 
-    height:192;
+.log-message.info {
+    color: #a5a5a5;
+    background-color: #242424;
+}
 
-    background:url(../textures/creative_casing.png);
+.log-message.log {
+    color: #a5a5a5;
+    background-color: #242424;
+}
 
+
+.stitle {
+    font-family: mctitle;
+    font-size: 40;
+    font-palette: #ffffff;
+    color: #ffffff;
+}
+.mtext {
+    font-family: mcnormal;
+    font-palette: #ffffff;
+    color: #ffffff;
+}
+.search {
+    font-family: mcnormal;
+    font-palette: #ffffff;
+    font-size: 20;
+    color: #ffffff;
+    border-bottom-color: #1e1e1f;
+    border-left-color: #1e1e1f;
+    border-right-color: #1e1e1f;
+    border-top-color: #1e1e1f;
+    background-color: #303132;
+    width: 100%;
+    height: 20;
     
-
 }
-
-.sergach {
-
-    width:192;
-
-    height:16px;
-
-    background:url(../textures/copper_plating.png) ;
-
-    
-
+.fuck {
+    font-family: mcsmall;
+    font-palette: #ffffff;
+    color: #ffffff;
 }
-
+.link {
+    font-family: mcsmall;
+    font-palette: #ffffff;
+    color: #ffffff;
+}
 body {
-
-    background:url(../dirt.png);
-
-}
-
-new ideas {
-
+    background-color: #474849;
     
-
 }
