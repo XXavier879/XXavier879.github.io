@@ -3,62 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Chat App</title>
-    <script src="/firebase-config.js"></script> <!-- Include your Firebase configuration -->
+    <title>Chat App</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.4/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.4/firebase-firestore.js"></script>
     <style>
         /* Add your CSS styles here */
-        .chat-sidebar {
-            width: 20%;
-            height: 100%;
-            float: left;
-            background-color: #f2f2f2;
-        }
-        .chat-container {
+        #chat-container {
             width: 80%;
-            height: 100%;
-            float: left;
-            padding: 20px;
+            margin: 0 auto;
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <div class="chat-sidebar">
-        <h2>Chats</h2>
-        <ul id="chat-list">
-            <!-- Chat list items will be populated here -->
-        </ul>
-    </div>
-    <div class="chat-container">
-        <h1>Chat with Receiver</h1>
+    <h1>Chat App</h1>
+    <div id="chat-container">
+        <label for="sender-id">Sender ID:</label>
+        <input type="text" id="sender-id" placeholder="Sender ID" />
+        <br>
+        <label for="receiver-id">Receiver ID:</label>
+        <input type="text" id="receiver-id" placeholder="Receiver ID" />
+        <br>
+        <textarea id="message-input" placeholder="Type your message"></textarea>
+        <br>
+        <button onclick="sendMessage()">Send</button>
         <div id="chat-messages">
             <!-- Chat messages will be displayed here -->
         </div>
-        <input type="text" id="message-input" placeholder="Write a message" style="width: 70%;" />
-        <button onclick="sendMessage()">Send</button>
     </div>
 
     <script>
-        // Function to send a message to Firebase
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDMh1skp6I2ipzBhIQz42EE8utdZqA9Ffc",
+            authDomain: "xgames-chat-database.firebaseapp.com",
+            projectId: "xgames-chat-database",
+            storageBucket: "xgames-chat-database.appspot.com",
+            messagingSenderId: "145136273026",
+            appId: "1:145136273026:web:67dbf6eac5b37eb7d8169b",
+            measurementId: "G-2MHNZ56YFE"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Function to send a message
         function sendMessage() {
-            var senderId = "YourSenderId";
-            var receiverId = "ReceiverUserId";
-            var message = document.getElementById("message-input").value;
-            
-            // Encode the message in base64
-            var encodedMessage = btoa(message);
+            const senderId = document.getElementById("sender-id").value;
+            const receiverId = document.getElementById("receiver-id").value;
+            const message = document.getElementById("message-input").value.trim();
 
-            // Push the message to Firebase
-            var database = firebase.database();
-            var chatRef = database.ref('chats'); // Replace 'chats' with your database structure
-            chatRef.push({
-                senderId: senderId,
-                receiverId: receiverId,
-                message: encodedMessage
-            });
-
-            // Clear the input field
-            document.getElementById("message-input").value = "";
+            if (senderId && receiverId && message) {
+                // Replace "chats" with your Firestore collection name
+                firebase.firestore().collection("chats").add({
+                    senderId: senderId,
+                    receiverId: receiverId,
+                    message: message,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                })
+                .then(() => {
+                    document.getElementById("message-input").value = "";
+                })
+                .catch(error => {
+                    console.error("Error sending message:", error);
+                });
+            }
         }
+
+        // Function to retrieve and display chat messages
+        function displayChatMessages() {
+            // Replace "chats" with your Firestore collection name
+            firebase.firestore().collection("chats")
+                .orderBy("timestamp")
+                .onSnapshot(snapshot => {
+                    const chatMessages = document.getElementById("chat-messages");
+                    chatMessages.innerHTML = "";
+
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const messageElement = document.createElement("div");
+                        messageElement.textContent = `${data.senderId}: ${data.message}`;
+                        chatMessages.appendChild(messageElement);
+                    });
+                });
+        }
+
+        // Call the function to display chat messages when the page loads
+        window.addEventListener("load", displayChatMessages);
     </script>
 </body>
 </html>
