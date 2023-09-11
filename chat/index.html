@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Chat App</title>
+    <script src="/firebase-config.js"></script> <!-- Include your Firebase configuration -->
+    <style>
+        /* Add your CSS styles here */
+        .chat-sidebar {
+            width: 20%;
+            height: 100%;
+            float: left;
+            background-color: #f2f2f2;
+        }
+        .chat-container {
+            width: 80%;
+            height: 100%;
+            float: left;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-sidebar">
+        <h2>Chats</h2>
+        <ul id="chat-list">
+            <!-- Chat list items will be populated here -->
+        </ul>
+    </div>
+    <div class="chat-container">
+        <h1>Chat with Receiver</h1>
+        <div id="chat-messages">
+            <!-- Chat messages will be displayed here -->
+        </div>
+        <input type="text" id="message-input" placeholder="Write a message" style="width: 70%;" />
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        // Function to send a message to Firebase
+        function sendMessage() {
+            var senderId = "YourSenderId";
+            var receiverId = "ReceiverUserId";
+            var message = document.getElementById("message-input").value;
+            
+            // Encode the message in base64
+            var encodedMessage = btoa(message);
+
+            // Push the message to Firebase
+            var database = firebase.database();
+            var chatRef = database.ref('chats'); // Replace 'chats' with your database structure
+            chatRef.push({
+                senderId: senderId,
+                receiverId: receiverId,
+                message: encodedMessage
+            });
+
+            // Clear the input field
+            document.getElementById("message-input").value = "";
+        }
+    </script>
+</body>
+</html>
