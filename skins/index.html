@@ -1,1 +1,70 @@
-nothing
+<!DOCTYPE html>
+<html>
+<head>
+<title>Upload skin to GitHub repo</title>
+</head>
+<body>
+<h1>Upload skin to GitHub repo</h1>
+
+<form action="upload_skin.py" method="post" enctype="multipart/form-data">
+  <input type="file" name="skins[file]">
+  <input type="submit" value="Upload">
+</form>
+
+<script>
+// Good errors array.
+const goodErrors = ["413 Request Entity Too Large"];
+
+// If the error code is in the good errors array, return "task was failed successfully".
+function isGoodError(errorCode) {
+  return goodErrors.includes(errorCode);
+}
+
+// Log the error to the console.
+function logError(errorCode, errorMessage) {
+  console.log(`Error: ${errorCode} - ${errorMessage}`);
+}
+
+// Handle the response from the GitHub API.
+function handleResponse(response) {
+  if (response.status === 201) {
+    // The skin was uploaded successfully.
+    alert("Skin uploaded successfully!");
+  } else {
+    // The skin was not uploaded successfully.
+    const errorCode = response.status;
+    const errorMessage = response.statusText;
+
+    if (isGoodError(errorCode)) {
+      // The error is a good error.
+      console.log("Task was failed successfully!");
+    } else {
+      // The error is not a good error.
+      logError(errorCode, errorMessage);
+    }
+  }
+}
+
+// Submit the form when the user clicks the "Upload" button.
+const form = document.querySelector("form");
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  // Get the skin file from the form.
+  const skinFile = form.elements["skins[file]"].files[0];
+
+  // Upload the skin file to the GitHub repo.
+  const response = await fetch("https://api.github.com/repos/myrepo/contents/skins/skin.png", {
+    method: "POST",
+    headers: {
+      "Authorization": "token YOUR_GITHUB_PERSONAL_ACCESS_TOKEN"
+    },
+    body: skinFile
+  });
+
+  // Handle the response from the GitHub API.
+  handleResponse(response);
+});
+</script>
+</body>
+</html>
