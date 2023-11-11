@@ -1,70 +1,117 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Upload skin to GitHub repo</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Player Info</title>
 </head>
 <body>
-<h1>Upload skin to GitHub repo</h1>
+    <h1>Minecraft Player Info</h1>
 
-<form action="upload_skin.py" method="post" enctype="multipart/form-data">
-  <input type="file" name="skins[file]">
-  <input type="submit" value="Upload">
-</form>
+    <label for="playerName">Enter Player Name:</label>
+    <input type="text" id="playerName" placeholder="Player Name" value="giovanka">
+    <button onclick="getPlayerInfo()">Get Player Info</button>
+    <div id="output"></div>
 
-<script>
-// Good errors array.
-const goodErrors = ["413 Request Entity Too Large"];
+    <script>
+        function nameToUuid(player_string) {
+            return new Promise((resolve, reject) => {
+                getName(player_string).then(name => {
+                    get(`https://api.mojang.com/users/profiles/minecraft/${name}`)
+                    .then(data => {
+                        if (data === '') reject(new Error('Player Not Found'));
+                        let json = JSON.parse(data);
+                        resolve({ name: json.name, uuid: json.id });
+                    })
+                    .catch(err => reject(err));
+                });
+            });
+        }
+        function getSkin(uuid_player) {
+            return new Promise((resolve, reject) => {
+                getUuid(uuid_player).then(uuid => {
+                    get(
+                        `https://sessionserver.mojang.com/session/minecraft/profile/${uuid}`
+                    )
+                    .then(data => {
+                        let json = JSON.parse(data);
+                        if (json.properties) {
+                            let properties = JSON.parse(
+                                common.base64Decode(json.properties[0].value)
+                            );
+                            let cape =
+                                properties &&
+                                properties.textures &&
+                                typeof properties.textures.CAPE !== 'undefined'
+                                    ? properties.textures.CAPE.url
+                                    : false;
+                            resolve({
+                                skin: properties.textures.SKIN.url,
+                                cape: cape || false
+                            });
+                        }
+                        reject(new Error('UUID not Valid'));
+                    })
+                    .catch(err => reject(err));
+                });
+            });
+        }
+        //common
+        function getName(player_string) {
+            return new Promise(resolve => {
+                if (typeof player_string === 'object') player_string.name.then(resolve);
+                else resolve(player_string);
+            });
+        }
+        function get(uri) {
+            return new Promise((resolve, reject) => {
+                let xhr = new XMLHttpRequest();
+                xhr.open('GET', uri, true);
 
-// If the error code is in the good errors array, return "task was failed successfully".
-function isGoodError(errorCode) {
-  return goodErrors.includes(errorCode);
-}
+                xhr.onload = function () {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        resolve(xhr.responseText);
+                    } else {
+                        reject(new Error(`HTTP error! Status: ${xhr.status}`));
+                    }
+                };
 
-// Log the error to the console.
-function logError(errorCode, errorMessage) {
-  console.log(`Error: ${errorCode} - ${errorMessage}`);
-}
+                xhr.onerror = function () {
+                    reject(new Error('Network error'));
+                };
 
-// Handle the response from the GitHub API.
-function handleResponse(response) {
-  if (response.status === 201) {
-    // The skin was uploaded successfully.
-    alert("Skin uploaded successfully!");
-  } else {
-    // The skin was not uploaded successfully.
-    const errorCode = response.status;
-    const errorMessage = response.statusText;
+                xhr.send();
+            });
+        }
+        function getUuid(player_string) {
+            return new Promise(resolve => {
+                if (typeof player_string === 'object') player_string.uuid.then(resolve);
+                else resolve(player_string);
+            });
+        }
+        // Your JavaScript functions here
 
-    if (isGoodError(errorCode)) {
-      // The error is a good error.
-      console.log("Task was failed successfully!");
-    } else {
-      // The error is not a good error.
-      logError(errorCode, errorMessage);
-    }
-  }
-}
+        async function getPlayerInfo() {
+            const playerNameInput = document.getElementById('playerName');
+            const outputDiv = document.getElementById('output');
 
-// Submit the form when the user clicks the "Upload" button.
-const form = document.querySelector("form");
-form.addEventListener("submit", async (event) => {
-  event.preventDefault();
+            try {
+                const playerInfo = await nameToUuid(playerNameInput.value);
+                const skinInfo = await getSkin(playerInfo.uuid);
 
-  // Get the skin file from the form.
-  const skinFile = form.elements["skins[file]"].files[0];
-
-  // Upload the skin file to the GitHub repo.
-  const response = await fetch("https://api.github.com/repos/myrepo/contents/skins/skin.png", {
-    method: "POST",
-    headers: {
-      "Authorization": "token YOUR_GITHUB_PERSONAL_ACCESS_TOKEN"
-    },
-    body: skinFile
-  });
-
-  // Handle the response from the GitHub API.
-  handleResponse(response);
-});
-</script>
+                // Display output
+                outputDiv.innerHTML = `
+                    <p><strong>Player Name:</strong> ${playerInfo.name}</p>
+                    <p><strong>UUID:</strong> ${playerInfo.uuid}</p>
+                    <p><strong>Skin URL:</strong> ${skinInfo.skin}</p>
+                    <p><strong>Cape URL:</strong> ${skinInfo.cape || 'No cape'}</p>
+                `;
+            } catch (error) {
+                outputDiv.innerHTML = `<p><strong>Error:</strong> ${error.message}</p>`;
+            }
+        }
+    </script>
 </body>
 </html>
