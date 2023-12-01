@@ -1,44 +1,138 @@
 <html>
     <head>
         <title>XGames server</title>
-        <link rel="shortcut icon" type="image/png" href="http://localhost:26543/storage/emulated/0/coding/proyecto+XGames/textures/XXavier879.ico">
-        <link rel="stylesheet" href="http://localhost:26543/storage/emulated/0/coding/proyecto+XGames/fake+minecraft/css/start screen.css">
-    </head>
+        <link rel="shortcut icon" type="image/png" href="./textures/XXavier879.ico">
+        <link rel="stylesheet" href="./css/estilo2.css">
+        <meta name="description" content="sitio de un server XD"></head>
     <body>
-    <div class="search-container">
-        <input id="input-search" type="search" onkeypress="return keyScriptInputSearch(event)" minlength="1" maxlength="500">
+        <img src="XGames beta.png" alt="XGames" class="title"/>
+        <div class="stitle">
+            XGames Update in page
+        </div>
+        <div class="mtext">
+            so we did a reattempt to make our page better
+        </div>
+        <div class="mtext">
+            and we got this.
+        </div>
+        <div class="mtext">
+            we are redoing every thing exept the code bar
+            and i dont know if u like this or not but im gonna tell u guys something but use code "<a style="color: #ff0000;">msg 2023 campo</a>(this code is now invalid)" for info
+        </div>
+        <div id="log">
+            
+        </div>
+<div style="text-align: center;">
+    <div class="search">
+        <input id="input-search" type="search" onkeypress="return keyScriptInputSearch(event)" minlength="0" maxlength="500" class="search">
     </div>
-    <div class="search-container">
-        <input id="custom-webpage-loader" type="search" onkeypress="return keyScriptcustomSearch(event)" minlength="1" maxlength="500">
-    </div>
+</div>
+        <div class="fuck">
+            take a look at my links
+        </div>
+        <div>
+            <a class="mtext" href="https://m.youtube.com/@xxavier8796">
+                youtube
+            </a>
+            <a class="mtext" style="color: #00ffff;">|</a>
+            <a class="mtext" href="https://discord.com/invite/wMsft9wPjw">
+                discord
+            </a>
+            <a class="mtext" style="color: #00ffff;">|</a>
+            <a class="mtext" href="/tutorials/mcjoin.html">
+                mc server tutorial
+            </a>
+        </div>
+        <div class="mtext">
+            <div>
+                did everything:<a class="mtext" style="color: #00ffff;" href="/users/XXavier879.html">XXavier879</a>
+            </div>
+        </div>
     <script type="text/javascript">
-        function validURL(str) {
-            var pattern = new RegExp(
-                '^(https?:\\/\\/)?' + // protocol
-                '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
-                '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
-                '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
-                '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
-                '(\\#[-a-z\\d_]*)?$',
-                'i',
-            ) // fragment locator
-            return !!pattern.test(str)
-        }
+    logMessage("pan", "warn");
+    console.warn('pan')
+    logMessage("pan", "error");
+    console.error('pan')
+    logMessage("pan", "info");
+    console.info('pan')
+    logMessage("pan", "log");
+    console.log('pan')
 
         function goSearch() {
             var searchValue = document.getElementById('input-search').value
-            if (validURL(searchValue)) {
-                if (
-                    searchValue.startsWith('https://') ||
-                    searchValue.startsWith('http://')
+            if (
+                searchValue.startsWith('/')
                 ) {
-                    window.location.href = searchValue
-                } else {
-                    window.location.href = 'http://' + searchValue
-                }
+                    if (searchValue.startsWith('/blockbench')) {
+                        window.location.href= "blockbench-master/index.html"
+                    }
+                    if (searchValue.startsWith('/cheats')) {
+                        logMessage("cheats enabled", "warn");
+                        console.warn('cheats enabled')
+                        window.location.href= ""
+                        
+                        
+                    }
+            } else if (
+                searchValue.startsWith('install')
+            ) {
+                logMessage("instalando virus", "warn");
+                console.warn('instalando virus')
+            } else if (
+                searchValue.startsWith('Install')
+            ) {
+                logMessage("instalando virus", "warn");
+                logMessage("dev", "debug");
+                logMessage("succ", "success");
+                logMessage("error", "error")
+                logMessage("info", "info")
+                console.warn('instalando virus')
+            } else if (
+                searchValue.startsWith('quieres ayuda')
+            ) {
+                logMessage("gracias", "warn");
+                console.warn('gracias')
+            } else if (
+                searchValue.startsWith('Quieres ayuda')
+            ) {
+                logMessage("gracias", "warn");
+                console.warn('gracias')
+            } else if (
+                searchValue.startsWith('quieres Ayuda')
+            ) {
+                logMessage("gracias", "warn");
+                console.warn('gracias')
+            } else if (
+                searchValue.startsWith('Quieres Ayuda')
+            ) {
+                logMessage("gracias", "warn");
+                console.warn('gracias')
+            } else if (
+                searchValue.startsWith('Msg 2023 campo')
+            ) {
+                window.location.href = "msg-2023.html"
+            } else if (
+                searchValue.startsWith('Puto')
+            ) {
+                console.warn('puto el que me dice puto')
+            } else if (
+                searchValue.startsWith('Puto')
+            ) {
+                console.warn('puto el que me dice puto')
+            } else if (
+                searchValue.startsWith('Puto')
+            ) {
+                console.warn('puto el que me dice puto')
+            } else if (
+                searchValue.startsWith('Puto')
+            ) {
+                console.warn('puto el que me dice puto')
+            } else if (
+                searchValue.startsWith('puto')
+            ) {
+                console.warn('puto el que me dice puto')
             } else {
-                var engineUrl = Client.getSearchEngineUrl().replace('%s', '')
-                window.location.href = engineUrl + searchValue
+                console.error('no code used')
             }
         }
 
@@ -49,28 +143,56 @@
             }
         }
 
-        function gocustomSearch() {
-            var searchValue = document.getElementById('input-search').value
-            if (validURL(searchValue)) {
-                if (
-                    searchValue.startsWith('www.')
-                ) {
-                    window.location.href = 'http://localhost:26543/storage/emulated/0/coding/searcher/custom_web/' +searchValue + '.html'
-                } else {
-                    window.location.href = 'http://localhost:26543/storage/emulated/0/coding/searcher/search=' + searchValue + '.html'
-                }
-            } else {
-                window.location.href = 'http://localhost:26543/storage/emulated/0/coding/searcher/search=' + searchValue + '.html'
-            }
-        }
-
-        function keyScriptcustomSearch(e) {
-            if (e.keyCode === 13) {
-                gocustomSearch()
-                return false
-            }
+        function exit(e) {
+            window.location.href = "www.google.com.html"
+            
+            
         }
     </script>
-    <iframe class="XGames-Web-screen" src="www.google.com" frameborder="10"></iframe>
+  <div id="log"></div>
+
+  <script>
+    // JavaScript code to append log messages to the log div
+function logMessage(message, type = "log") {
+  const logElement = document.getElementById("log");
+  const messageElement = document.createElement("div");
+  messageElement.classList.add("log-message");
+  
+  // Define a mapping between log types and icon paths
+  const iconPaths = {
+    log: "textures/dark_metal_block.png",
+    warn: "textures/copper_plating.png",
+    error: "textures/path_to_error_icon.png",
+    info: "textures/glazed_terracotta_white.png",
+    success: "textures/diamond_block.png",
+    debug: "textures/creative_casing.png"
+  };
+  
+  // Create an image element for the icon
+  const icon = document.createElement("img");
+  icon.src = iconPaths[type] || "default_icon.png"; // Use a default icon if type is not found
+  
+  // Create a span element for the message text
+  const textSpan = document.createElement("span");
+  textSpan.textContent = message;
+  
+  // Append the image and text elements to the message element
+  messageElement.appendChild(icon);
+  messageElement.appendChild(textSpan);
+  
+  // Add classes based on the log type
+  messageElement.classList.add(type);
+  
+  logElement.appendChild(messageElement);
+}
+  </script>
+</body>
+</html>
+
     </body>
+    
+    
+    
+    
+    
 </html>
