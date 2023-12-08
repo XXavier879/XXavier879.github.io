@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Xgames bot troll</title>
+</head>
+<body>
+  <h1>talk as "nekotina"</h1>
+  <form id="webhookForm">
+    <label for="message">Enter your message:</label><br>
+    <textarea id="message" name="message" rows="4" cols="50"></textarea><br><br>
+    <input type="submit" value="Submit">
+  </form>
+
+  <script>
+    // Function to send the message to the Discord webhook
+    function sendMessageToWebhook(message) {
+      const webhookURL = 'https://discord.com/api/webhooks/1182743886905483326/sR4f_AvspxmrYfQCuOoV2sip6BubCHSfqZRHQpE-Y7xeHEvDdqCe-dv3tcq3oPdTDSdm';
+      const payload = JSON.stringify({ content: message });
+
+      fetch(webhookURL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: payload
+      })
+      .then(response => {
+        if (response.ok) {
+          alert('Message sent successfully!');
+        } else {
+          alert('Failed to send message.');
+        }
+      })
+      .catch(error => {
+        alert('An error occurred while sending the message.');
+        console.error('Error:', error);
+      });
+    }
+
+    // Form submission event handler
+    document.getElementById('webhookForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const message = document.getElementById('message').value.trim();
+      if (message !== '') {
+        sendMessageToWebhook(message);
+      } else {
+        alert('Please enter a message.');
+      }
+    });
+  </script>
+</body>
+</html>
