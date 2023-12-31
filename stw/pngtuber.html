@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PngTuber Style Audio Interaction</title>
+<style>
+  /* Add your styling here */
+  .container {
+    text-align: center;
+    padding: 20px;
+  }
+  #avatar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+    <button onclick="startAudio()">Start Audio Capture</button>
+    <div>
+        <label for="volumeThreshold">Volume Threshold:</label>
+        <input type="range" id="volumeThreshold" min="0" max="100" value="50">
+    </div>
+    <div id="volumeOutput">Volume: 0</div>
+    <div id="vtstatus">Volume Threshold status goes here</div>
+    <div id="talkingStatus">Not Talking</div> <!-- Added this line -->
+    <label for="avatartu">avatar talking(png)</label>
+    <input type="file" id="avatartu" accept="all">
+    <label for="avatarfu">avatar not talking(png)</label>
+    <input type="file" id="avatarfu" accept="all">
+    <input type="button" name="endedit" id="endedit" value="done" />
+</div>
+<div id="avatar">
+    <img id="avatart" src="" alt="Uploaded Image">
+    <img id="avatarf" src="" alt="Uploaded Image">
+</div>
+<script>
+const avatarthing = document.getElementById('avatar');
+avatarthing.style.display = 'none';
+document.getElementById('avatartu').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = document.getElementById('avatart');
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+});
+document.getElementById('avatarfu').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = document.getElementById('avatarf');
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+const avatart = document.getElementById('avatart');
+const avatarf = document.getElementById('avatarf');
+
+document.getElementById('endedit').addEventListener('click', function() {
+    document.querySelector('.container').style.display = 'none';
+    document.getElementById('avatar').style.display = 'block';
+});
+
+// Rest of your script
+</script>
+<script>
+let talking = false;
+let audioContext;
+let analyser;
+let microphone;
+let volumeThreshold = 50;
+let audioDataArray;
+let rafId;
+
+document.getElementById('volumeThreshold').addEventListener('input', function() {
+    volumeThreshold = this.value/100;
+});
+
+document.getElementById('vtstatus').textContent = 'volumeThreshold';
+
+
+function startAudio() {
+    if (!navigator.mediaDevices) {
+        console.log('mediaDevices not supported');
+        return;
+    }
+
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+        .then(stream => {
+            microphone = audioContext.createMediaStreamSource(stream);
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 2048;
+            audioDataArray = new Uint8Array(analyser.frequencyBinCount);
+            microphone.connect(analyser);
+            analyzeAudio();
+        })
+        .catch(err => {
+            console.log('Error accessing microphone', err);
+        });
+}
+
+function analyzeAudio() {
+    analyser.getByteTimeDomainData(audioDataArray);
+    let sum = 0;
+    let average = 0;
+
+    for (let i = 0; i < audioDataArray.length; i++) {
+        let sample = audioDataArray[i];
+        let x = (sample / 128.0) - 1; // Normalize sample to [-1, 1]
+        sum += x * x;
+    }
+
+    average = Math.sqrt(sum / audioDataArray.length);
+    let volume = average * 100; // Scale volume for easier threshold comparison
+
+    document.getElementById('volumeOutput').textContent = 'Volume: ' + volume.toFixed(2);
+
+    let newTalkingState = (volume > volumeThreshold);
+
+    console.log('Current Volume:', volume.toFixed(2));
+    console.log('Volume Threshold:', volumeThreshold);
+    console.log('New Talking State:', newTalkingState);
+    console.log('Current Talking State:', talking);
+
+    if (newTalkingState !== talking) {
+        talking = newTalkingState;
+        console.log('Talking State Changed:', talking);
+        document.getElementById('talkingStatus').textContent = talking ? 'Talking' : 'Not Talking';
+    }
+    if (talking) {
+        avatart.style.display = 'block';
+        avatarf.style.display = 'none';
+    } else {
+        avatart.style.display = 'none';
+        avatarf.style.display = 'block';
+    }
+    rafId = requestAnimationFrame(analyzeAudio);
+}
+
+
+// Ensure to stop the animation frame and close the audio context when not needed
+function stopAudioAnalysis() {
+    cancelAnimationFrame(rafId);
+    if (audioContext) {
+        audioContext.close();
+    }
+}
+</script>
+</body>
+</html>
