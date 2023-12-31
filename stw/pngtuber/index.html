@@ -42,6 +42,17 @@
 <script>
 const avatarthing = document.getElementById('avatar');
 avatarthing.style.display = 'none';
+    // Request the browser to go fullscreen on the avatar element
+    if (avatarthing.requestFullscreen) {
+        avatarthing.requestFullscreen();
+    } else if (avatarthing.mozRequestFullScreen) { /* Firefox */
+        avatarthing.mozRequestFullScreen();
+    } else if (avatarthing.webkitRequestFullscreen) { /* Chrome, Safari, and Opera */
+        avatarthing.webkitRequestFullscreen();
+    } else if (avatarthing.msRequestFullscreen) { /* IE/Edge */
+        avatarthing.msRequestFullscreen();
+    }
+
 document.getElementById('avatartu').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {
