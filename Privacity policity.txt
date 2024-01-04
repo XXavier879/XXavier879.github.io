@@ -1,0 +1,2 @@
+we cant recopile your data
+the pngtuber tool will use your microphone to translate sounds to if you are talking or not aswell as recording screen and microphone stuff to lower the usage of recording tools
