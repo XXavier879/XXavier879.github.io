@@ -2,6 +2,77 @@
     <head>
         <title>XGames server</title>
         <link rel="shortcut icon" type="image/png" href="./textures/XXavier879.ico">
+        <style type="text/css" media="all">
+            #downloads, #posts {
+                margin: 20px;
+                padding: 10px;
+            }
+            .download, .post {
+                margin-bottom: 15px;
+                padding: 10px;
+                border: 5px solid #343434;
+                background-color: #141414;
+                color: #cecece;
+            }
+            
+            .download a, .post a {
+                text-decoration: none;
+                color: blue;
+            }
+            button.scriptbutton {
+                background: none;      /* Remove background */
+                color: inherit;        /* Use the text color of the parent */
+                border: none;          /* Remove border */
+                padding: 0;            /* Remove padding */
+                margin: 0;             /* Remove margin */
+                font: inherit;         /* Inherit font from parent */
+                cursor: pointer;       /* Optional: Change cursor to pointer to indicate it's clickable */
+                outline: inherit;      /* Inherit the outline style (for accessibility) */
+            }
+        </style>
+        <style type="text/css" media="all">
+            #toast {
+                visibility: hidden;
+                min-width: 250px;
+                margin-left: -125px;
+                background-color: #333;
+                color: #fff;
+                text-align: center;
+                border-radius: 20px;
+                padding: 16px;
+                position: fixed;
+                z-index: 1;
+                left: 50%;
+                bottom: 30px;
+                font-size: 17px;
+            }
+            
+            #toast.show {
+                visibility: visible;
+                -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+                animation: fadein 0.5s, fadeout 0.5s 2.5s;
+            }
+            
+            @-webkit-keyframes fadein {
+                from {bottom: 0; opacity: 0;} 
+                to {bottom: 30px; opacity: 1;}
+            }
+            
+            @keyframes fadein {
+                from {bottom: 0; opacity: 0;}
+                to {bottom: 30px; opacity: 1;}
+            }
+            
+            @-webkit-keyframes fadeout {
+                from {bottom: 30px; opacity: 1;} 
+                to {bottom: 0; opacity: 0;}
+            }
+            
+            @keyframes fadeout {
+                from {bottom: 30px; opacity: 1;}
+                to {bottom: 0; opacity: 0;}
+            }
+        </style>
         <link rel="stylesheet" href="./css/estilo2.css">
         <meta name="description" content="sitio de un server XD"></head>
     <body>
@@ -24,7 +95,7 @@
         </div>
 <div style="text-align: center;">
     <div class="search">
-        <input id="input-search" type="search" onkeypress="return keyScriptInputSearch(event)" minlength="0" maxlength="500" class="search">
+        <input id="input-search" type="search" onkeypress="return cheatInput(event)" minlength="0" maxlength="500" class="search">
     </div>
 </div>
         <div class="fuck">
@@ -48,151 +119,209 @@
                 did everything:<a class="mtext" style="color: #00ffff;" href="/users/XXavier879.html">XXavier879</a>
             </div>
         </div>
-    <script type="text/javascript">
-    logMessage("pan", "warn");
-    console.warn('pan')
-    logMessage("pan", "error");
-    console.error('pan')
-    logMessage("pan", "info");
-    console.info('pan')
-    logMessage("pan", "log");
-    console.log('pan')
 
-        function goSearch() {
-            var searchValue = document.getElementById('input-search').value
-            if (
-                searchValue.startsWith('/')
+        <div id="log"></div>
+        <div class="mtext" id="downloads"></div>
+        <div class="mtext" id="posts"></div>
+        <div class="mtext" id="toast"></div>
+        <script>
+
+            function logMessage(message, type = "log") {
+              const logElement = document.getElementById("log");
+              const messageElement = document.createElement("div");
+              messageElement.classList.add("log-message");
+              
+              // Define a mapping between log types and icon paths
+              const iconPaths = {
+                log: "textures/dark_metal_block.png",
+                warn: "textures/copper_plating.png",
+                error: "textures/path_to_error_icon.png",
+                info: "textures/glazed_terracotta_white.png",
+                success: "textures/diamond_block.png",
+                debug: "textures/creative_casing.png"
+              };
+              
+              // Create an image element for the icon
+              const icon = document.createElement("img");
+              icon.src = iconPaths[type] || "default_icon.png"; // Use a default icon if type is not found
+              
+              // Create a span element for the message text
+              const textSpan = document.createElement("span");
+              textSpan.textContent = message;
+              
+              // Append the image and text elements to the message element
+              messageElement.appendChild(icon);
+              messageElement.appendChild(textSpan);
+              
+              // Add classes based on the log type
+              messageElement.classList.add(type);
+              
+              logElement.appendChild(messageElement);
+            }
+        </script>
+        <script type="text/javascript">
+            logMessage("pan", "warn");
+            console.warn('pan')
+            logMessage("pan", "error");
+            console.error('pan')
+            logMessage("pan", "info");
+            console.info('pan')
+            logMessage("pan", "log");
+            console.log('pan')
+
+            function cheat() {
+                var searchValue = document.getElementById('input-search').value
+                if (
+                    searchValue.startsWith('/')
+                    ) {
+                        if (searchValue.startsWith('/blockbench')) {
+                            window.location.href= "blockbench-master/index.html"
+                        }
+                        if (searchValue.startsWith('/cheats')) {
+                            logMessage("cheats enabled", "warn");
+                            console.warn('cheats enabled')
+                            window.location.href= ""
+                            
+                            
+                        }
+                } else if (
+                    searchValue.startsWith('install')
                 ) {
-                    if (searchValue.startsWith('/blockbench')) {
-                        window.location.href= "blockbench-master/index.html"
-                    }
-                    if (searchValue.startsWith('/cheats')) {
-                        logMessage("cheats enabled", "warn");
-                        console.warn('cheats enabled')
-                        window.location.href= ""
-                        
-                        
-                    }
-            } else if (
-                searchValue.startsWith('install')
-            ) {
-                logMessage("instalando virus", "warn");
-                console.warn('instalando virus')
-            } else if (
-                searchValue.startsWith('Install')
-            ) {
-                logMessage("instalando virus", "warn");
-                logMessage("dev", "debug");
-                logMessage("succ", "success");
-                logMessage("error", "error")
-                logMessage("info", "info")
-                console.warn('instalando virus')
-            } else if (
-                searchValue.startsWith('quieres ayuda')
-            ) {
-                logMessage("gracias", "warn");
-                console.warn('gracias')
-            } else if (
-                searchValue.startsWith('Quieres ayuda')
-            ) {
-                logMessage("gracias", "warn");
-                console.warn('gracias')
-            } else if (
-                searchValue.startsWith('quieres Ayuda')
-            ) {
-                logMessage("gracias", "warn");
-                console.warn('gracias')
-            } else if (
-                searchValue.startsWith('Quieres Ayuda')
-            ) {
-                logMessage("gracias", "warn");
-                console.warn('gracias')
-            } else if (
-                searchValue.startsWith('Msg 2023 campo')
-            ) {
-                window.location.href = "msg-2023.html"
-            } else if (
-                searchValue.startsWith('Puto')
-            ) {
-                console.warn('puto el que me dice puto')
-            } else if (
-                searchValue.startsWith('Puto')
-            ) {
-                console.warn('puto el que me dice puto')
-            } else if (
-                searchValue.startsWith('Puto')
-            ) {
-                console.warn('puto el que me dice puto')
-            } else if (
-                searchValue.startsWith('Puto')
-            ) {
-                console.warn('puto el que me dice puto')
-            } else if (
-                searchValue.startsWith('puto')
-            ) {
-                console.warn('puto el que me dice puto')
-            } else {
-                console.error('no code used')
+                    logMessage("instalando virus", "warn");
+                    console.warn('instalando virus')
+                } else if (
+                    searchValue.startsWith('Install')
+                ) {
+                    logMessage("instalando virus", "warn");
+                    logMessage("dev", "debug");
+                    logMessage("succ", "success");
+                    logMessage("error", "error")
+                    logMessage("info", "info")
+                    console.warn('instalando virus')
+                } else if (
+                    searchValue.startsWith('quieres ayuda')
+                ) {
+                    logMessage("gracias", "warn");
+                    console.warn('gracias')
+                } else if (
+                    searchValue.startsWith('Quieres ayuda')
+                ) {
+                    logMessage("gracias", "warn");
+                    console.warn('gracias')
+                } else if (
+                    searchValue.startsWith('quieres Ayuda')
+                ) {
+                    logMessage("gracias", "warn");
+                    console.warn('gracias')
+                } else if (
+                    searchValue.startsWith('Quieres Ayuda')
+                ) {
+                    logMessage("gracias", "warn");
+                    console.warn('gracias')
+                } else if (
+                    searchValue.startsWith('Msg 2023 campo')
+                ) {
+                    window.location.href = "msg-2023.html"
+                } else if (
+                    searchValue.startsWith('Puto')
+                ) {
+                    console.warn('puto el que me dice puto')
+                } else if (
+                    searchValue.startsWith('Puto')
+                ) {
+                    console.warn('puto el que me dice puto')
+                } else if (
+                    searchValue.startsWith('Puto')
+                ) {
+                    console.warn('puto el que me dice puto')
+                } else if (
+                    searchValue.startsWith('Puto')
+                ) {
+                    console.warn('puto el que me dice puto')
+                } else if (
+                    searchValue.startsWith('puto')
+                ) {
+                    console.warn('puto el que me dice puto')
+                } else {
+                    console.error('no code used')
+                }
             }
-        }
 
-        function keyScriptInputSearch(e) {
-            if (e.keyCode === 13) {
-                goSearch()
-                return false
+            function cheatInput(e) {
+                if (e.keyCode === 13) {
+                    cheat()
+                    return false
+                }
             }
-        }
 
-        function exit(e) {
-            window.location.href = "www.google.com.html"
-            
-            
+            function exit(e) {
+                window.location.href = "www.google.com"
+            }
+        </script>
+        <script type="text/javascript" charset="utf-8">
+        function showToast(message) {
+            var toast = document.getElementById("toast");
+            toast.innerHTML = message;
+            toast.className = "show";
+            setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+        function newDownload(title, fileLink, description) {
+            var downloadDiv = document.getElementById('downloads');
+            var downloadElement = document.createElement('div');
+            downloadElement.className = 'download';
+            downloadElement.innerHTML = `<strong>${title}</strong><br><a href="${fileLink}" download>Download</a><p>${description}</p>`;
+            downloadDiv.appendChild(downloadElement);
+        }
+        function newPost(title, type, content, script) {
+            var postsDiv = document.getElementById('posts');
+            if (!postsDiv) {
+                console.error('The posts div does not exist!');
+                return;
+            }
+        
+            var postElement = document.createElement('div');
+            postElement.className = 'post';
+            postElement.innerHTML = `<strong>${title}</strong><br>`;
+        
+            switch (type) {
+                case 'image':
+                    postElement.innerHTML += `<img src="${content}" alt="${title}">`;
+                    break;
+                case 'link':
+                    postElement.innerHTML += `<a href="${script}">${content}</a>`;
+                    break;
+                case 'text_only':
+                    postElement.innerHTML += `<p>${content}</p>`;
+                    break;
+                case 'iframe':
+                    postElement.innerHTML += `<iframe src="${script}" frameborder="0"></iframe>`;
+                    break;
+                case 'script':
+                    var scriptEl = document.createElement('button'); // Changed to button for better user interaction
+                    scriptEl.textContent = content;
+                    scriptEl.onclick = function() {
+                        // Execute the script here
+                        new Function(script)();
+                    };
+                    scriptEl.classList.add("scriptbutton")
+                    postElement.appendChild(scriptEl);
+                    break;
+                default:
+                    console.warn('Unknown post type:', type);
+                    break;
+            }
+        
+            postsDiv.appendChild(postElement);
         }
     </script>
-  <div id="log"></div>
+        <script type="text/javascript" charset="utf-8">
+        showToast("welcome")
+        newPost("Nekotina troll", "link", "discord troll page", "xxavier879.github.io/unknown/data")
+        newPost("pngtuber tool", "link", "url to the page","XXavier879.github.io/stw/pngtuber")
+        newPost("skins(wip)", "link", "url to the skins index.html","XXavier879.github.io/skins")
+        newPost("heyy ru a programmer", "script", "run eruda", "javascript:(function () { var script = document.createElement('script'); script.src='//liriliri.github.io/eruda/eruda.min.js'; document.body.appendChild(script); script.onload = function () { eruda.init() } })();");
+    </script>
 
-  <script>
-    // JavaScript code to append log messages to the log div
-function logMessage(message, type = "log") {
-  const logElement = document.getElementById("log");
-  const messageElement = document.createElement("div");
-  messageElement.classList.add("log-message");
-  
-  // Define a mapping between log types and icon paths
-  const iconPaths = {
-    log: "textures/dark_metal_block.png",
-    warn: "textures/copper_plating.png",
-    error: "textures/path_to_error_icon.png",
-    info: "textures/glazed_terracotta_white.png",
-    success: "textures/diamond_block.png",
-    debug: "textures/creative_casing.png"
-  };
-  
-  // Create an image element for the icon
-  const icon = document.createElement("img");
-  icon.src = iconPaths[type] || "default_icon.png"; // Use a default icon if type is not found
-  
-  // Create a span element for the message text
-  const textSpan = document.createElement("span");
-  textSpan.textContent = message;
-  
-  // Append the image and text elements to the message element
-  messageElement.appendChild(icon);
-  messageElement.appendChild(textSpan);
-  
-  // Add classes based on the log type
-  messageElement.classList.add(type);
-  
-  logElement.appendChild(messageElement);
-}
-  </script>
-</body>
-</html>
 
     </body>
-    
-    
-    
-    
-    
-  </html>
+</html>
