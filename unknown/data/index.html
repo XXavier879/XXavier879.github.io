@@ -5,20 +5,42 @@
   <title>Xgames bot troll</title>
 </head>
 <body>
-  <h1>webhook manager</h1>
+  <h1>webhook manaher</h1>
   <form id="webhookForm">
+    <label for="webhookSelect">Choose a webhook:</label><br>
+    <select id="webhookSelect"></select><br><br>
     <label for="message">Enter your message:</label><br>
     <textarea id="message" name="message" rows="4" cols="50"></textarea><br><br>
     <input type="submit" value="Submit">
   </form>
 
   <script>
-    // Function to send the message to the Discord webhook
+    let webhooks = {};
+
+    // Function to add new webhook
+    function addWebhook(name, url) {
+      webhooks[name] = url;
+      updateWebhookOptions();
+    }
+
+    // Update the dropdown options
+    function updateWebhookOptions() {
+      const select = document.getElementById('webhookSelect');
+      select.innerHTML = '';
+      for (const name in webhooks) {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        select.appendChild(option);
+      }
+    }
+
+    // Function to send the message to the selected Discord webhook
     function sendMessageToWebhook(message) {
-      const webhookURL = 'https://discord.com/api/webhooks/1182743886905483326/sR4f_AvspxmrYfQCuOoV2sip6BubCHSfqZRHQpE-Y7xeHEvDdqCe-dv3tcq3oPdTDSdm';
+      const selectedWebhook = webhooks[document.getElementById('webhookSelect').value];
       const payload = JSON.stringify({ content: message });
 
-      fetch(webhookURL, {
+      fetch(selectedWebhook, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -48,6 +70,16 @@
         alert('Please enter a message.');
       }
     });
+
+    // Add webhooks here
+    addWebhook("Agipeti", "https://discord.com/api/webhooks/1193518600636600330/_gIVDr-abh96d-wMqH6mIb9Tm09FA5ori2IN6YkC4VlLiL3vNDX6gK37g5Cn0C2qBrRn");
+    addWebhook("raptorr15_5", "https://discord.com/api/webhooks/1193518620110749737/La_ymwTRj_08xaqVoRC6MB1vnHm1CS8Nmx3aDm_Kwx7fpf_N4laBS5EZOxUl5OIDs7xm");
+    addWebhook("notmonsterc", "https://discord.com/api/webhooks/1193519655789265051/FlM1dKLmHiwkZ5FWQxgJl05ivlwWVfMCzFINBJmn9pNV3-5-tJhiYkiPIzwzIipseBTl");
+    addWebhook("Vipul22", "https://discord.com/api/webhooks/1193520046518046750/64wG0-LcLeiboUmPrNpdVy9bQgTBhRQHSC_iDZiC-9fov9Ekjy0bYbV0qP9z7v7p-LHU");
+    addWebhook("asiandog", "https://discord.com/api/webhooks/1193520190504325140/R79Bl8FVVrqxJxKyTKeF8jyQTp2B_qRqNnLFZZwyj0qvgMrF6dltETKeZcMlCJRYWHin");
+    addWebhook("blackbmgoo", "https://discord.com/api/webhooks/1193534800997400696/swcdC-yIhutpYyuH39XKYNYoo1Em5ZJoO2gBMCXnXWwueH--zFgPvXIgIc9VQJ0xo4gC");
+    addWebhook("template", "");
+    // Add more webhooks as needed
   </script>
 </body>
 </html>
