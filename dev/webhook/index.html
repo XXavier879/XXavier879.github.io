@@ -72,7 +72,6 @@
         option.textContent = name;
         select.appendChild(option);
       }
-      updatePreview();
     }
 
     function updateDeleteWebhookOptions() {
@@ -84,15 +83,6 @@
         option.textContent = name;
         deleteSelect.appendChild(option);
       }
-    }
-
-    function updatePreview() {
-      const selectedWebhook = webhooks[document.getElementById('webhookSelect').value];
-      const previewName = document.getElementById('previewName');
-      const previewAvatar = document.getElementById('previewAvatar');
-
-      previewName.textContent = `Nombre: ${document.getElementById('webhookSelect').value}`;
-      previewAvatar.src = selectedWebhook.avatar;
     }
 
     function sendMessageToWebhook(message, customWebhook) {
@@ -212,8 +202,6 @@
       event.preventDefault();
       deleteWebhook();
     });
-
-    document.getElementById('webhookSelect').addEventListener('change', updatePreview);
 
     // Add this line to set the initial language
     document.getElementById('htmlTag').lang = 'es';
