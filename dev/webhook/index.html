@@ -253,6 +253,7 @@ async function loginUser(event) {
     webpageDiv.style.display = "block";
 
     // Any startup code for the webpage
+    fetchWebhooks()
   } else {
     alert("Authentication failed. Access denied.");
     document.getElementById('loginPassword').value = ""; // Clear the password field
