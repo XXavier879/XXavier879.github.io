@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es" id="htmlTag">
+<head>
+  <meta charset="UTF-8">
+  <title>Administrador de Webhooks XGames</title>
+
+  <style>
+    #previewAvatar {
+      width: 100px; /* Adjust the size as needed */
+      height: 100px; /* Adjust the size as needed */
+    }
+  </style>
+</head>
+<body>
+  <div id="webpage" style="display: none">
+  <h1>Administrador de Webhooks</h1>
+  <form id="createWebhookForm">
+    <label for="newWebhookName">Nombre del Webhook:</label><br>
+    <input type="text" id="newWebhookName" name="newWebhookName"><br><br>
+    <label for="newWebhookAvatar">URL del Avatar:</label><br>
+    <input type="text" id="newWebhookAvatar" name="newWebhookAvatar" value="https://xxavier879.github.io/dpfp/"><br><br>
+    <input type="submit" value="Crear Webhook">
+  </form>
+  <hr>
+  <div id="webhookPreview">
+    <h2>Webhook Preview</h2>
+    <img id="previewAvatar" src="" alt="Webhook Avatar">
+    <p id="previewName"></p>
+  </div>
+  <form id="webhookForm">
+    <label for="webhookSelect">Selecciona un webhook:</label><br>
+    <select id="webhookSelect"></select><br><br>
+    <label for="message">Ingresa tu mensaje:</label><br>
+    <textarea id="message" name="message" rows="4" cols="50"></textarea><br><br>
+    <label for="customWebhook">URL del Webhook Personalizado:</label><br>
+    <input type="text" id="customWebhook" name="customWebhook"><br><br>
+    <input type="submit" value="Enviar">
+  </form>
+  <hr>
+  <form id="deleteWebhookForm">
+    <label for="deleteWebhookSelect">Selecciona un webhook para eliminar:</label><br>
+    <select id="deleteWebhookSelect"></select><br><br>
+    <input type="submit" value="Eliminar Webhook">
+  </form>
+  </div>
+  <form id="loginForm">
+    <label for="loginPassword">Password:</label><br>
+    <input type="password" id="loginPassword" name="loginPassword"><br><br>
+    <input type="submit" value="Login">
+  </form>
+  <script>
+    let webhooks = {};
+
+    function fetchWebhooks() {
+      fetch('https://morning-picayune-fabrosaurus.glitch.me/listWebhooks')
+        .then(response => response.json())
+        .then(data => {
+          data.forEach(webhook => {
+            addWebhook(webhook.name, webhook.id, webhook.avatar);
+          });
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function addWebhook(name, id, avatar) {
+      webhooks[name] = { id: id, avatar: avatar };
+      updateWebhookOptions();
+      updateDeleteWebhookOptions();
+    }
+
+    function updateWebhookOptions() {
+      const select = document.getElementById('webhookSelect');
+      select.innerHTML = '';
+      for (const name in webhooks) {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        select.appendChild(option);
+      }
+      updatePreview();
+    }
+
+    function updateDeleteWebhookOptions() {
+      const deleteSelect = document.getElementById('deleteWebhookSelect');
+      deleteSelect.innerHTML = '';
+      for (const name in webhooks) {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        deleteSelect.appendChild(option);
+      }
+    }
+
+    function updatePreview() {
+      const selectedWebhook = webhooks[document.getElementById('webhookSelect').value];
+      const previewName = document.getElementById('previewName');
+      const previewAvatar = document.getElementById('previewAvatar');
+
+      previewName.textContent = `Nombre: ${document.getElementById('webhookSelect').value}`;
+      previewAvatar.src = selectedWebhook.avatar;
+    }
+
+    function sendMessageToWebhook(message, customWebhook) {
+      const selectedWebhook = webhooks[document.getElementById('webhookSelect').value];
+      const payload = {
+        webhookId: selectedWebhook.id,
+        message: message,
+        link: customWebhook.trim() !== "" ? customWebhook.trim() : ""
+      };
+
+      fetch('https://morning-picayune-fabrosaurus.glitch.me/sendMessage', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(response => {
+        if (response.ok) {
+          alert('Mensaje enviado exitosamente');
+        } else {
+          alert('Error al enviar el mensaje.');
+        }
+      })
+      .catch(error => {
+        alert('Se produjo un error al enviar el mensaje.');
+        console.error('Error:', error);
+      });
+    }
+
+    function createNewWebhook(name, avatar) {
+      if (avatar.includes(' ')) {
+        alert('La URL del avatar no debe contener espacios.');
+        return;
+      }
+
+      for (let key in webhooks) {
+        if (webhooks[key].avatar === avatar && key === name) {
+          alert('Ya existe un webhook con el mismo nombre y avatar.');
+          return;
+        }
+      }
+
+      fetch('https://morning-picayune-fabrosaurus.glitch.me/createWebhook', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name: name, avatarUrl: avatar })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          addWebhook(data.name, data.id, avatar);
+          alert('Webhook creado exitosamente');
+        } else {
+          alert('Error al crear el webhook.');
+        }
+      })
+      .catch(error => {
+        alert('Se produjo un error al crear el webhook.');
+        console.error('Error:', error);
+      });
+    }
+
+    function deleteWebhook() {
+      const selectedWebhook = webhooks[document.getElementById('deleteWebhookSelect').value];
+      const payload = JSON.stringify({ id: selectedWebhook.id });
+
+      fetch('https://morning-picayune-fabrosaurus.glitch.me/deleteWebhook', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: payload
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Webhook eliminado exitosamente');
+          delete webhooks[document.getElementById('deleteWebhookSelect').value];
+          updateWebhookOptions();
+          updateDeleteWebhookOptions();
+        } else {
+          alert('Error al eliminar el webhook.');
+        }
+      })
+      .catch(error => {
+        alert('Se produjo un error al eliminar el webhook.');
+        console.error('Error:', error);
+      });
+    }
+
+    document.getElementById('createWebhookForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const name = document.getElementById('newWebhookName').value.trim();
+      const avatar = document.getElementById('newWebhookAvatar').value.trim();
+      if (name !== '') {
+        createNewWebhook(name, avatar);
+      } else {
+        alert('Por favor, ingresa un nombre para el webhook.');
+      }
+    });
+
+    document.getElementById('webhookForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const messageElement = document.getElementById('message');
+      const message = "> " + messageElement.value.trim().replace(/\n/g, '\n> ');
+      const customWebhook = document.getElementById('customWebhook').value.trim();
+      if (message !== '') {
+        sendMessageToWebhook(message, customWebhook);
+      } else {
+        alert('Please enter a message.');
+      }
+    });
+    document.getElementById('deleteWebhookForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      deleteWebhook();
+    });
+
+    document.getElementById('webhookSelect').addEventListener('change', updatePreview);
+
+    // Add this line to set the initial language
+    document.getElementById('htmlTag').lang = 'es';
+
+    // Add these lines to create a language selector and update the lang attribute
+    const languageSelector = document.createElement('select');
+    languageSelector.innerHTML = '<option value="es">Español</option><option value="en">English</option>';
+    languageSelector.addEventListener('change', function() {
+      document.getElementById('htmlTag').lang = this.value;
+    });
+    document.head.appendChild(languageSelector);
+
+
+async function loginUser(event) {
+  event.preventDefault();
+  const username = "XXavier879";
+  const password = document.getElementById('loginPassword').value;
+
+  const response = await fetch('https://morning-picayune-fabrosaurus.glitch.me/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ username, password }),
+  });
+
+  const data = await response.json();
+
+  if (response.ok) {
+    let loginForm = document.getElementById("loginForm");
+    let webpageDiv = document.getElementById("webpage");
+
+    // Hide the login form
+    loginForm.style.display = "none";
+
+    // Show the webpage div
+    webpageDiv.style.display = "block";
+
+    // Any startup code for the webpage
+  } else {
+    alert("Authentication failed. Access denied.");
+    document.getElementById('loginPassword').value = ""; // Clear the password field
+  }
+}
+
+// Call the login function when the login form is submitted
+document.getElementById('loginForm').addEventListener('submit', loginUser);
+
+// Call the login function when the login form is submitted
+document.getElementById('loginForm').addEventListener('submit', loginUser);
+
+// Call the login function when the login form is submitted
+document.getElementById('loginForm').addEventListener('submit', loginUser);
+
+  </script>
+</body>
+</html>
