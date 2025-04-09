@@ -60,7 +60,6 @@ body {
     padding: 5px;
     border-radius: 5px;
     cursor: pointer;
-    display: none;
 }
 .taskbar .task:hover {
     background-color: #555;
@@ -199,8 +198,6 @@ let firstClick = true;
 });*/
     let zIndex = 1;
     let openWindows = [];
-    let taskbar = document.createElement('div');
-    taskbar.className = 'taskbar';
     document.body.appendChild(taskbar);
 
     // Quick settings panel
@@ -512,32 +509,7 @@ function makeResizable(elem) {
     });
 }
     function addToTaskbar(title, iconSrc, processId) {
-        const task = document.createElement('div');
-        task.className = 'task';
-        task.dataset.processid = processId;
 
-        const icon = document.createElement('img');
-        icon.src = iconSrc;
-        task.appendChild(icon);
-
-        const taskTitle = document.createElement('span');
-        taskTitle.textContent = title;
-        task.appendChild(taskTitle);
-
-task.addEventListener('click', () => {
-    const process = processManager.getProcess(processId);
-    const windowDiv = document.querySelector(`[data-processid="${processId}"]`);
-    if (process && process.minimized) {
-        windowDiv.style.display = 'block';  // Un-minimize the window
-        processManager.updateProcess(processId, { minimized: false });
-    } else {
-        windowDiv.style.zIndex = zIndex++;
-        process.background = false;
-        windowDiv.style.display = 'block';
-    }
-});
-
-        taskbar.appendChild(task);
     }
 
     // Initialize Quick Settings
