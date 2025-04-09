@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Explorer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #171717;
+      color: #fff;
+    }
+    .container {
+      background-color: rgba(0, 0, 0, 0.12);
+      padding: 0px;
+      display: flex;
+      align-items: center;
+      max-height: 44px;
+      margin: 0 0;
+      border-radius: 5px;
+      margin-bottom: 5px;
+    }
+    .icon {
+      padding: 2px;
+      margin-right: 5px;
+      height: 40px;
+      width: 40px;
+      object-fit: contain;
+    }
+    .content {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+    .label {
+      color: #ffffff;
+      font-size: large;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-bottom: 0;
+      max-width: 100%;
+    }
+    .info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: nowrap;
+      width: 100%;
+    }
+    .info-date,
+    .info-size {
+      color: #bbbbbb;
+      font-size: small;
+    }
+    pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      background: #222;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    #cwdContainer {
+      text-align: center;
+      margin: 20px 0;
+    }
+    #cwdContainer .cwd-name {
+      font-size: 2em;
+      font-weight: bold;
+    }
+    #cwdContainer .parent-dir {
+      font-size: 1.2em;
+      color: #bbbbbb;
+    }
+  </style>
+</head>
+<body>
+  <h2>Filesystem Explorer</h2>
+  <div id="cwdContainer">
+    <div class="cwd-name" id="cwdName">Current Directory</div>
+    <div class="parent-dir" id="parentDir"></div>
+  </div>
+  <div id="listing"></div>
+  <pre id="fileContent"></pre>
+
+  <script>
+    let cwd = "cdfs:/";
+
+    const loadFS = () => JSON.parse(localStorage.getItem("emulatedFS") || "{}");
+    const saveFS = (fs) => localStorage.setItem("emulatedFS", JSON.stringify(fs));
+
+    const changeDir = (newPath) => {
+      const fs = loadFS();
+      if (fs[newPath] && Array.isArray(fs[newPath])) {
+        cwd = newPath;
+        updateCWDDisplay();
+        listDir();
+      } else {
+        alert("Invalid directory: " + newPath);
+      }
+    };
+
+    const goUp = () => {
+      if (cwd === "cdfs:/") return;
+      const parts = cwd.split("/").filter(p => p);
+      parts.pop(); // Remove last segment
+      const upPath = parts.join("/") + "/";
+      changeDir(upPath.startsWith("cdfs:/") ? upPath : "cdfs:/");
+    };
+
+    const updateCWDDisplay = () => {
+      document.getElementById("cwdName").textContent = cwd.split("/")[cwd.split("/").length - 1]
+      const parentPath = cwd.split("/").slice(0, -1).join("/") + "/";
+      document.getElementById("parentDir").innerHTML = `<a href="#" onclick="changeDir('${parentPath}')">.. (Parent)</a>`;
+    };
+
+    const listDir = () => {
+      const fs = loadFS();
+      const list = fs[cwd] || [];
+      const container = document.getElementById("listing");
+      container.innerHTML = "";
+
+      // Add ".." to go up
+      if (cwd !== "cdfs:/") {
+        const up = document.createElement("div");
+        up.classList.add("container");
+        const upIcon = document.createElement("img");
+        upIcon.src = "./fsn_up.png";
+        upIcon.className = "icon";
+        const upLabel = document.createElement("p");
+        upLabel.className = "label";
+        upLabel.innerHTML = `<a href="#" onclick="goUp()" style="text-decoration: none; color: inherit;">..</a>`;
+        up.appendChild(upIcon);
+        up.appendChild(upLabel);
+        container.appendChild(up);
+      }
+
+      const sortedFiles = list.sort((a, b) => {
+        const aIsDir = fs[cwd + a]?.length !== undefined;
+        const bIsDir = fs[cwd + b]?.length !== undefined;
+        return (aIsDir === bIsDir) ? a.localeCompare(b) : (aIsDir ? -1 : 1);
+      });
+
+      sortedFiles.forEach(item => {
+        const fullPath = cwd + item;
+        const isFolder = item.endsWith("/");
+
+        const fileStats = fs[fullPath];
+        const icon = isFolder ? 'fsn_folder.png' : getFileIcon(fullPath);
+        const fileSize = isFolder ? `${fs[fullPath]?.length || 0} elements` : (fileStats?.length ? (fileStats.length / 1024).toFixed(2) + ' KB' : 'N/A');
+        const fileDate = new Date(fileStats?.mtime || Date.now()).toLocaleString();
+
+        const fileDiv = document.createElement("div");
+        fileDiv.classList.add("container");
+
+        const fileIcon = document.createElement("img");
+        fileIcon.src = `./${icon}`;
+        fileIcon.classList.add("icon");
+
+        const fileLabel = document.createElement("p");
+        fileLabel.classList.add("label");
+        fileLabel.innerHTML = `<a href="#" onclick="handleFileClick('${fullPath}')">${item}</a>`;
+
+        const fileInfo = document.createElement("div");
+        fileInfo.classList.add("info");
+        fileInfo.innerHTML = `<p class="info-size">${fileSize}</p><p class="info-date">${fileDate}</p>`;
+
+        fileDiv.appendChild(fileIcon);
+        fileDiv.appendChild(fileLabel);
+        fileDiv.appendChild(fileInfo);
+
+        container.appendChild(fileDiv);
+      });
+    };
+
+    const handleFileClick = (path) => {
+      const fs = loadFS();
+      const isFolder = fs[path] && Array.isArray(fs[path]);
+
+      if (isFolder) {
+        // If it's a folder, change to that directory and reload the listing
+        changeDir(path);
+      } else {
+        // If it's a file, show its content
+        const fileContent = fs[path];
+        if (fileContent) {
+          document.getElementById("fileContent").textContent = fileContent;
+        }
+      }
+    };
+
+    const getFileIcon = (path) => {
+      if (path.endsWith("/")) {
+        return 'fsn_folder.png';
+      }
+      const ext = path.split('.').pop().toLowerCase();
+      switch (ext) {
+        case '.tar': case '.bz2': case '.rpm': case '.xz': case '.deb': case '.jar':
+        case '.arj': case '.bzip2': case '.gz': case '.wim': return 'fsn_archive.png';
+        case '.7z': return 'fsn_archive_7z.png';
+        case '.zip': return 'fsn_archive_zip.png';
+        case '.rar': return 'fsn_archive_rar.png';
+        case '.htm': case '.html': case '.php': return 'fsn_web.png';
+        case '.txt': case '.cfg': return 'fsn_text.png';
+        // Add more cases as needed
+        default: return 'fsn_unknown.png';
+      }
+    };
+
+    (function initFS() {
+      if (!localStorage.getItem("emulatedFS")) {
+        const initialFS = {
+          "cdfs:/": ["home/", "bin/", "etc/"],
+          "cdfs:/home/": ["user/"],
+          "cdfs:/home/user/": ["Documents/", "Downloads/", "Desktop/", "Pictures/", ".bashrc", "README.txt"],
+          "cdfs:/home/user/Documents/": [],
+          "cdfs:/home/user/Downloads/": [],
+          "cdfs:/home/user/Desktop/": [],
+          "cdfs:/home/user/Pictures/": [],
+          "cdfs:/home/user/.bashrc": "export PATH=$PATH:/usr/bin",
+          "cdfs:/home/user/README.txt": "Welcome to your fresh environment!\n...",
+          "cdfs:/bin/": ["bash", "ls", "cat", "rm"],
+          "cdfs:/bin/bash": "echo 'Welcome to the shell!'",
+          "cdfs:/bin/ls": "echo 'Listing files...'",
+          "cdfs:/bin/cat": "echo 'Displaying file content...'",
+          "cdfs:/bin/rm": "echo 'Removing files...'",
+          "cdfs:/etc/": ["hostname", "passwd"],
+          "cdfs:/etc/hostname": "localhost",
+          "cdfs:/etc/passwd": "user:x:1000:1000::/home/user:/bin/bash"
+        };
+        saveFS(initialFS);
+      }
+      updateCWDDisplay();
+      listDir();
+    })();
+  </script>
+</body>
+</html>

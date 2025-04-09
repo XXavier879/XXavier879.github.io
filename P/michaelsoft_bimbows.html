@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta charset="UTF-8">
+    <title>NekOS</title>
+    <style>
+/* Prevent text selection */
+* {
+  user-select: none;
+}
+    button {
+      border:0;
+      border-color: #000000;
+      color: inherit;
+      margin:inherit;
+      padding:inherit;
+      background-color:inherit;
+    }
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transform-origin: top left;
+    overflow: hidden;  /* Prevent scrolling */
+    background-image: url('Minecraft_2025-04-08-22-59-08.png');
+    background-size: 100%;
+}
+
+/*@media (max-width: 1920px) {
+    body {
+    width: 200%;
+    height: 200%;
+        transform: scale(0.5);
+        transform-origin: top left;
+    }
+}*/
+.taskbar {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    background-color: #444;
+    height: 40px;
+    padding: 5px;
+    gap: 10px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.taskbar .task {
+    display: flex;
+    align-items: center;
+    background-color: #333;
+    padding: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.taskbar .task:hover {
+    background-color: #555;
+}
+
+.taskbar .task img {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+}
+
+/* Quick Settings - Bottom right */
+.quick-settings {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 10px;
+    border-radius: 5px;
+    color: white;
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.quick-settings span {
+    font-size: 14px;
+}
+
+.button {
+    width: 20px;
+    height: 20px;
+    background-color: #888;
+    border-radius: 50%;
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #aaa;
+}
+
+/* Additional Styles */
+.window {
+    width: 300px;
+    height: 200px;
+    border: 1px solid #000;
+    position: absolute;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.title-bar {
+    background: #ddd;
+    cursor: move;
+    padding: 5px;
+    user-select: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.content {
+    height: calc(100% - 30px);
+    overflow: hidden;
+}
+
+iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+        .button {
+            width: 20px;
+            height: 20px;
+            background-color: #888;
+            border-radius: 50%;
+            margin-left: 5px;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background-color: #aaa;
+        }
+
+.shortcut-grid {  
+    display: flex;  
+    flex-wrap: wrap;  
+    gap: 15px;  
+    justify-content: flex-start;  
+    padding: 20px;  
+    color:#fff;
+}  
+  
+.shortcut {  
+    text-align: center;  
+    cursor: pointer;  
+    width: 100px;  
+}  
+  
+.shortcut img {  
+    width: 60px;  
+    height: 60px;  
+    margin-bottom: 5px;  
+}  
+  
+.shortcut:hover {  
+    background-color: #e0e0e0;  
+}
+
+.resize-handle {
+    width: 15px;
+    height: 15px;
+    background-color: #aaa;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    cursor: se-resize;
+}
+    </style>
+</head>
+<body>
+<div id="desktoparr" class="shortcut-grid">
+  
+</div>
+<script type="module">
+let firstClick = true;
+
+/*document.body.addEventListener('click', () => {
+    if (firstClick) {
+        firstClick = false;
+        toggleFullscreen();
+    }
+});*/
+    let zIndex = 1;
+    let openWindows = [];
+    let taskbar = document.createElement('div');
+    taskbar.className = 'taskbar';
+    document.body.appendChild(taskbar);
+
+    // Quick settings panel
+    let quickSettings = document.createElement('div');
+    quickSettings.className = 'quick-settings';
+    document.body.appendChild(quickSettings);
+
+    const processManager = {
+        processes: [],
+        addProcess(appId, processId, x, y, iframeSrc) {
+            const process = {
+                appId,
+                processId,
+                x,
+                y,
+                iframeSrc,
+                minimized: false,
+                background: false
+            };
+            this.processes.push(process);
+            return process;
+        },
+        getProcess(processId) {
+            return this.processes.find(p => p.processId === processId);
+        },
+        updateProcess(processId, updates) {
+            const process = this.getProcess(processId);
+            if (process) {
+                Object.assign(process, updates);
+            }
+        }
+    };
+
+    // Update connection status through pinging
+    function checkConnectionStatus() {
+        fetch('https://example.com', { method: 'GET', mode: 'no-cors' })
+            .then(response => {
+                quickSettings.querySelector('#connection-status').textContent = 'Connected';
+            })
+            .catch(() => {
+                quickSettings.querySelector('#connection-status').textContent = 'Disconnected';
+            });
+    }
+
+    // Update the time and date
+    function updateTime() {
+        const now = new Date();
+        const time = now.toLocaleTimeString();
+        const date = now.toLocaleDateString();
+        quickSettings.querySelector('#time').textContent = `Time: ${time}`;
+        quickSettings.querySelector('#date').textContent = `Date: ${date}`;
+    }
+
+    // Toggle fullscreen
+// This will trigger fullscreen and disable zooming
+function toggleFullscreen() {
+    if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen();
+    } else if (document.documentElement.mozRequestFullScreen) { // Firefox
+        document.documentElement.mozRequestFullScreen();
+    } else if (document.documentElement.webkitRequestFullscreen) { // Chrome, Safari, Opera
+        document.documentElement.webkitRequestFullscreen();
+    } else if (document.documentElement.msRequestFullscreen) { // IE/Edge
+        document.documentElement.msRequestFullscreen();
+    }
+
+    // Disable zooming by setting meta tag properties
+    const viewportMeta = document.querySelector('meta[name="viewport"]');
+    if (viewportMeta) {
+        viewportMeta.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no');
+    } else {
+        const newMeta = document.createElement('meta');
+        newMeta.name = "viewport";
+        newMeta.content = 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no';
+        document.head.appendChild(newMeta);
+    }
+
+    // Ensure full screen view is maximized
+    document.body.style.margin = '0';  // Remove any margins that could affect the view
+    document.body.style.overflow = 'hidden';  // Prevent scrolling
+}
+
+// First click to trigger fullscreen and set viewport meta tag
+
+    function initQuickSettings() {
+        // Connection Status
+        const connectionStatus = document.createElement('span');
+        connectionStatus.id = 'connection-status';
+        connectionStatus.textContent = 'Checking connection...';
+        quickSettings.appendChild(connectionStatus);
+
+        // Battery Status (Using Battery Status API)
+        const batteryStatus = document.createElement('span');
+        batteryStatus.id = 'battery-status';
+        batteryStatus.textContent = 'Battery: Loading...';
+        quickSettings.appendChild(batteryStatus);
+
+        // Time and Date
+        const time = document.createElement('span');
+        time.id = 'time';
+        quickSettings.appendChild(time);
+
+        const date = document.createElement('span');
+        date.id = 'date';
+        quickSettings.appendChild(date);
+
+        // Fullscreen toggle button
+        const fullscreenButton = document.createElement('button');
+        fullscreenButton.textContent = 'Toggle Fullscreen';
+        fullscreenButton.style.padding = '5px';
+        fullscreenButton.addEventListener('click', toggleFullscreen);
+        quickSettings.appendChild(fullscreenButton);
+
+        // Periodically update connection status and time/date
+        setInterval(checkConnectionStatus, 60000); // Every 60 seconds
+        setInterval(updateTime, 1000); // Every second
+
+        // Get battery status
+        if (navigator.getBattery) {
+            navigator.getBattery().then(function(battery) {
+                function updateBatteryStatus() {
+                    const level = Math.round(battery.level * 100);
+                    quickSettings.querySelector('#battery-status').textContent = `Battery: ${level}%`;
+                }
+
+                // Update battery status on events
+                battery.addEventListener('levelchange', updateBatteryStatus);
+                battery.addEventListener('chargingchange', updateBatteryStatus);
+
+                updateBatteryStatus();
+            });
+        } else {
+            quickSettings.querySelector('#battery-status').textContent = 'Battery: Not available';
+        }
+    }
+
+    // Function to create a program window (a process)
+    function createWindow(title, iframeSrc, iconSrc, appId, x, y) {
+        const processId = generateUniqueId();
+        const windowDiv = document.createElement('div');
+        windowDiv.className = 'window';
+        windowDiv.style.left = `${x}px`;
+        windowDiv.style.top = `${y}px`;
+        windowDiv.style.zIndex = zIndex++;
+        windowDiv.dataset.processid = processId;
+
+        const titleBar = document.createElement('div');
+        titleBar.className = 'title-bar';
+        titleBar.textContent = title;
+
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'content';
+        const iframe = document.createElement('iframe');
+        iframe.src = iframeSrc;
+        contentDiv.appendChild(iframe);
+
+        const closeButton = createButton('close', () => closeWindow(windowDiv, processId));
+        const maximizeButton = createButton('maximize', () => maximizeWindow(windowDiv, processId));
+        const minimizeButton = createButton('minimize', () => minimizeWindow(windowDiv, processId));
+
+        titleBar.appendChild(closeButton);
+        titleBar.appendChild(maximizeButton);
+        titleBar.appendChild(minimizeButton);
+
+        windowDiv.appendChild(titleBar);
+        windowDiv.appendChild(contentDiv);
+
+        const resizeHandle = document.createElement('div');
+        resizeHandle.className = 'resize-handle';
+        windowDiv.appendChild(resizeHandle);
+
+        document.body.appendChild(windowDiv);
+
+        makeDraggable(windowDiv);
+        makeResizable(windowDiv);
+
+        addToTaskbar(title, iconSrc, processId);
+
+        return windowDiv;
+    }
+
+    function generateUniqueId() {
+        return `process_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+    }
+
+    function createButton(type, callback) {
+        const button = document.createElement('div');
+        button.className = 'button';
+        button.style.backgroundColor = type === 'close' ? 'red' : type === 'maximize' ? 'green' : 'yellow';
+        button.addEventListener('click', callback);
+        return button;
+    }
+
+    function closeWindow(windowDiv, processId) {
+        const taskbarItem = document.querySelector(`.task[data-processid="${processId}"]`);
+        if (taskbarItem) taskbar.removeChild(taskbarItem);
+        document.body.removeChild(windowDiv);
+        processManager.updateProcess(processId, { background: true });
+    }
+
+let originalDimensions = {};
+
+function maximizeWindow(windowDiv, processId) {
+    // Save original position and size before maximizing
+    const rect = windowDiv.getBoundingClientRect();
+    originalDimensions[processId] = { width: rect.width, height: rect.height, left: rect.left, top: rect.top };
+
+    windowDiv.style.width = '100%';
+    windowDiv.style.height = '100%';
+    windowDiv.style.left = '0';
+    windowDiv.style.top = '0';
+    processManager.updateProcess(processId, { x: 0, y: 0 });
+}
+
+function unmaximizeWindow(windowDiv, processId) {
+    const dimensions = originalDimensions[processId];
+    if (dimensions) {
+        windowDiv.style.width = `${dimensions.width}px`;
+        windowDiv.style.height = `${dimensions.height}px`;
+        windowDiv.style.left = `${dimensions.left}px`;
+        windowDiv.style.top = `${dimensions.top}px`;
+    }
+}
+    function minimizeWindow(windowDiv, processId) {
+        windowDiv.style.display = 'none';
+        processManager.updateProcess(processId, { minimized: true });
+    }
+
+function makeDraggable(elem) {  
+    let activeWindow = null;  
+    let offsetX = 0, offsetY = 0;  
+    let scaleFactor = 1//(window.innerWidth <= 1920) ? 2 : 1;  // Check for the screen width
+
+    const titleBar = elem.querySelector('.title-bar');  
+
+    titleBar.addEventListener('mousedown', startDrag);  
+    titleBar.addEventListener('touchstart', startDrag);  
+
+    function startDrag(e) {  
+        activeWindow = elem;  
+        offsetX = (e.clientX || e.touches[0].clientX) - elem.getBoundingClientRect().left;  
+        offsetY = (e.clientY || e.touches[0].clientY) - elem.getBoundingClientRect().top;  
+        elem.style.zIndex = zIndex++;  
+    }  
+
+    document.addEventListener('mouseup', endDrag);  
+    document.addEventListener('touchend', endDrag);  
+
+    function endDrag() {  
+        activeWindow = null;  
+    }  
+
+    document.addEventListener('mousemove', doDrag);  
+    document.addEventListener('touchmove', doDrag);  
+
+    function doDrag(e) {  
+        if (activeWindow) {  
+            e.preventDefault();  
+            let clientX = (e.clientX || e.touches[0].clientX) * scaleFactor;  
+            let clientY = (e.clientY || e.touches[0].clientY) * scaleFactor;  
+            activeWindow.style.left = clientX - offsetX + 'px';  
+            activeWindow.style.top = clientY - offsetY + 'px';  
+        }  
+    }  
+
+    // Update scale factor on window resize
+    window.addEventListener('resize', function() {
+        scaleFactor = (window.innerWidth <= 1920) ? 2 : 1;
+    });
+}  
+
+function makeResizable(elem) {  
+    const resizeHandle = elem.querySelector('.resize-handle');  
+    let isResizing = false;  
+    let scaleFactor = (window.innerWidth <= 1920) ? 2 : 1;  // Check for the screen width
+
+    resizeHandle.addEventListener('mousedown', startResize);  
+    resizeHandle.addEventListener('touchstart', startResize);  
+
+    function startResize(e) {  
+        isResizing = true;  
+        document.addEventListener('mousemove', doResize);  
+        document.addEventListener('mouseup', endResize);  
+        document.addEventListener('touchmove', doResize);  
+        document.addEventListener('touchend', endResize);  
+    }  
+
+    function doResize(e) {  
+        if (isResizing) {  
+            const rect = elem.getBoundingClientRect();  
+            const width = (e.clientX - rect.left || e.touches[0].clientX - rect.left) * scaleFactor;  
+            const height = (e.clientY - rect.top || e.touches[0].clientY - rect.top) * scaleFactor;  
+            elem.style.width = Math.max(150, width) + 'px';  
+            elem.style.height = Math.max(100, height) + 'px';  
+        }  
+    }  
+
+    function endResize() {  
+        isResizing = false;  
+        document.removeEventListener('mousemove', doResize);  
+        document.removeEventListener('mouseup', endResize);  
+        document.removeEventListener('touchmove', doResize);  
+        document.removeEventListener('touchend', endResize);  
+    }  
+
+    // Update scale factor on window resize
+    window.addEventListener('resize', function() {
+        scaleFactor = (window.innerWidth <= 1920) ? 2 : 1;
+    });
+}
+    function addToTaskbar(title, iconSrc, processId) {
+        const task = document.createElement('div');
+        task.className = 'task';
+        task.dataset.processid = processId;
+
+        const icon = document.createElement('img');
+        icon.src = iconSrc;
+        task.appendChild(icon);
+
+        const taskTitle = document.createElement('span');
+        taskTitle.textContent = title;
+        task.appendChild(taskTitle);
+
+task.addEventListener('click', () => {
+    const process = processManager.getProcess(processId);
+    const windowDiv = document.querySelector(`[data-processid="${processId}"]`);
+    if (process && process.minimized) {
+        windowDiv.style.display = 'block';  // Un-minimize the window
+        processManager.updateProcess(processId, { minimized: false });
+    } else {
+        windowDiv.style.zIndex = zIndex++;
+        process.background = false;
+        windowDiv.style.display = 'block';
+    }
+});
+
+        taskbar.appendChild(task);
+    }
+
+    // Initialize Quick Settings
+    initQuickSettings();
+class ProgramShortcut {
+    constructor(iconUrl, label, iframeSrc, windowIcon, x, y) {
+        this.iconUrl = iconUrl;
+        this.label = label;
+        this.iframeSrc = iframeSrc;
+        this.windowIcon = windowIcon;
+        this.x = x;
+        this.y = y;
+
+        this.isContextMenuOpen = false;
+
+        this.createProgram();
+    }
+
+    createProgram() {
+        this.programDiv = document.createElement('div');
+        this.programDiv.className = 'shortcut';
+        this.createIcon();
+        this.createLabel();
+        this.createContextMenu();
+
+        // Append the programDiv to the shortcut grid
+        const shortcutGrid = document.getElementById('desktoparr');
+        shortcutGrid.appendChild(this.programDiv);
+
+        // Add event listeners for context menu and clicks
+        this.programDiv.addEventListener('contextmenu', this.onContextMenu.bind(this));
+        this.programDiv.addEventListener('click', this.onLeftClick.bind(this));
+        this.programDiv.addEventListener('dblclick', this.onDoubleClick.bind(this));
+        this.programDiv.addEventListener('touchstart', this.onTouchStart.bind(this));
+        document.addEventListener('click', this.onDocumentClick.bind(this));
+    }
+
+    createIcon() {
+        const icon = document.createElement('img');
+        icon.src = this.iconUrl;
+        icon.style.width = '50px';
+        icon.style.height = '50px';
+        this.programDiv.appendChild(icon);
+    }
+
+    createLabel() {
+        const text = document.createElement('div');
+        text.textContent = this.label;
+        this.programDiv.appendChild(text);
+    }
+
+    createContextMenu() {
+        this.contextMenu = document.createElement('div');
+        this.contextMenu.className = 'context-menu';
+        this.contextMenu.style.position = 'absolute';
+        this.contextMenu.style.display = 'none';
+        this.contextMenu.innerHTML = `
+            <div>Open</div>
+            <div>Other Option</div>
+        `;
+        document.body.appendChild(this.contextMenu);
+    }
+
+    onContextMenu(e) {
+        e.preventDefault();
+        this.isContextMenuOpen = true;
+
+        // Position the context menu where the right-click occurred
+        this.contextMenu.style.left = `${e.clientX}px`;
+        this.contextMenu.style.top = `${e.clientY}px`;
+        this.contextMenu.style.display = 'block';
+    }
+
+    onLeftClick(e) {
+        e.preventDefault();
+        // Handle left click (Open the program)
+        if (this.isContextMenuOpen) {
+            this.contextMenu.style.display = 'none'; // Close context menu if it's open
+        } else {
+            this.runProgram();
+        }
+    }
+
+    onDoubleClick(e) {
+        e.preventDefault();
+        // Handle double-click (Open the program)
+        this.runProgram();
+    }
+
+    onTouchStart(e) {
+        e.preventDefault();
+        // Track touch duration to determine if it is a single or long press
+        this.touchStartTime = Date.now();
+        this.touchEndTime = 0;
+
+        // Add touchend listener to determine touch duration
+        this.programDiv.addEventListener('touchend', this.onTouchEnd.bind(this));
+    }
+
+    onTouchEnd(e) {
+        this.touchEndTime = Date.now();
+        const touchDuration = this.touchEndTime - this.touchStartTime;
+
+        if (touchDuration > 1000) {
+            // Long press (open context menu)
+            this.onContextMenu(e);
+        } else {
+            // Single tap (open program)
+            this.runProgram();
+        }
+
+        // Remove the touchend event listener
+        this.programDiv.removeEventListener('touchend', this.onTouchEnd.bind(this));
+    }
+
+    onDocumentClick(e) {
+        // Close the context menu if clicked outside
+        if (e.target !== this.contextMenu && !this.programDiv.contains(e.target)) {
+            this.contextMenu.style.display = 'none';
+        }
+    }
+
+    runProgram() {
+        // Open the program using createWindow
+        createWindow(this.label, this.iframeSrc, this.windowIcon, this.label.toLowerCase(), this.x, this.y);
+    }
+}
+
+// Assuming createWindow function exists like this:
+    // Create a sample window
+    createWindow('Sample App', 'https://example.com', 'https://via.placeholder.com/20', 'app1', 100, 100);
+    new ProgramShortcut('./fsn_audio.png', 'Audio Analyzer2', './apps/osciloscope_audio/index.html', './icons/audio-analyzer-icon.png', 0, 0);
+    new ProgramShortcut('./fsn_game_rom.png', 'Sensors', './apps/sensors/index.html', './icons/sensors-icon.png', 0, 0);
+    new ProgramShortcut('./fsn_audio.png', 'Audio Analyzer', './apps/audio_analyzer/index.html', './icons/audio-analyzer-icon.png', 0, 0);
+    new ProgramShortcut('./fsn_xml.png', 'Terminal', './apps/terminal/index.html', './icons/Terminal-icon.png', 0, 0);
+    new ProgramShortcut('./fsn_powerpoint.png', 'Presentacion', './apps/present/index.html', './icons/fsn_powerpoint.png', 0, 0);
+
+    // Function to create a program4 icon with a label
+
+    const initFS = () => {
+      if (!localStorage.getItem("emulatedFS")) {
+        const initialFS = {
+          "cdfs:/": ["home/", "bin/", "etc/"], // Top-level directories
+          "cdfs:/home/": ["user/"], // Home folder with user directory
+          "cdfs:/home/user/": ["Documents/", "Downloads/", "Desktop/", "Pictures/", ".bashrc", "README.txt"], // User directories and files
+          "cdfs:/home/user/Documents/": [], // Empty documents folder
+          "cdfs:/home/user/Downloads/": [], // Empty downloads folder
+          "cdfs:/home/user/Desktop/": [], // Empty desktop folder
+          "cdfs:/home/user/Pictures/": [], // Empty pictures folder
+          "cdfs:/home/user/.bashrc": "export PATH=$PATH:/usr/bin", // Sample configuration file
+          "cdfs:/home/user/README.txt": "Welcome to your fresh environment!\nYour user directory is set up with the following folders: Documents, Downloads, Desktop, and Pictures.\n", // Readme for new users
+          "cdfs:/bin/": ["bash", "ls", "cat", "rm"], // Binary utilities
+          "cdfs:/bin/bash": "echo 'Welcome to the shell!'", // Sample binary content
+          "cdfs:/bin/ls": "echo 'Listing files...'", // Sample binary content
+          "cdfs:/bin/cat": "echo 'Displaying file content...'", // Sample binary content
+          "cdfs:/bin/rm": "echo 'Removing files...'", // Sample binary content
+          "cdfs:/etc/": ["hostname", "passwd"], // System configuration files
+          "cdfs:/etc/hostname": "localhost", // Sample system config
+          "cdfs:/etc/passwd": "user:x:1000:1000::/home/user:/bin/bash" // User info
+        };
+        localStorage.setItem("emulatedFS", JSON.stringify(initialFS));
+      }
+    };
+
+</script>
+</body>
+</html>

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PngTuber Style Audio Interaction</title>
+<style>
+  /* Add your styling here */
+  .container {
+    text-align: center;
+    padding: 20px;
+  }
+  #avatar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+    <button onclick="startAudio()">Start Audio Capture</button>
+    <div>
+        <label for="volumeThreshold">Volume Threshold:</label>
+        <input type="range" id="volumeThreshold" min="0" max="100" value="50">
+    </div>
+    <div id="volumeOutput">Volume: 0</div>
+    <div id="vtstatus">Volume Threshold status goes here</div>
+    <div id="talkingStatus">Not Talking</div> <!-- Added this line -->
+    <label for="avatartu">avatar talking(png)</label>
+    <input type="file" id="avatartu" accept="all">
+    <label for="avatarfu">avatar not talking(png)</label>
+    <input type="file" id="avatarfu" accept="all">
+    <input type="button" name="endedit" id="endedit" value="done" />
+</div>
+<div id="avatar">
+    <img id="avatart" src="" alt="Uploaded Image">
+    <img id="avatarf" src="" alt="Uploaded Image">
+    <div>
+        _
+    </div>
+    <div>
+        _
+    </div>
+    <div>
+        _
+    </div>
+    <div>
+        _
+    </div>
+    <div>
+        _
+    </div>
+    <div>
+        _
+    </div>
+    <div>
+        _
+    </div>
+    <div>
+        _
+    </div>
+    <button id="stopAndClose">Stop Recording & Close Page</button>
+</div>
+<!--useless things-->
+<script>
+
+// Enhanced Toast Notification with Android-style Design
+function showToast(message, duration = 3000) {
+    const toast = document.createElement("div");
+    toast.textContent = message;
+    toast.style.position = 'fixed';
+    toast.style.bottom = '20px';
+    toast.style.left = '50%';
+    toast.style.transform = 'translateX(-50%)';
+    toast.style.backgroundColor = '#323232'; // Android toast gray
+    toast.style.color = 'white';
+    toast.style.padding = '16px 24px';
+    toast.style.borderRadius = '25px'; // Rounded corners
+    toast.style.fontSize = '14px';
+    toast.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.25)';
+    toast.style.opacity = '0';
+    toast.style.transition = 'opacity 0.5s ease-in-out';
+    toast.style.zIndex = '1000';
+
+    // Append and animate toast
+    document.body.appendChild(toast);
+    setTimeout(() => { toast.style.opacity = '1'; }, 50); // Fade in
+
+    // Remove toast after duration
+    setTimeout(() => {
+        toast.style.opacity = '0'; // Fade out
+        setTimeout(() => { document.body.removeChild(toast); }, 500); // Delay for fade-out
+    }, duration);
+}
+
+// Usage Example
+showToast("This is a toast message");
+
+
+// Dialog Notification Example
+function showDialog(title, message) {
+    const dialog = document.createElement("div");
+    dialog.style.position = 'fixed';
+    dialog.style.top = '50%';
+    dialog.style.left = '50%';
+    dialog.style.transform = 'translate(-50%, -50%)';
+    dialog.style.backgroundColor = 'white';
+    dialog.style.padding = '20px';
+    dialog.style.borderRadius = '5px';
+    dialog.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
+    dialog.style.zIndex = '1000';
+
+    const titleElement = document.createElement("h2");
+    titleElement.textContent = title;
+    dialog.appendChild(titleElement);
+
+    const messageElement = document.createElement("p");
+    messageElement.textContent = message;
+    dialog.appendChild(messageElement);
+
+    const closeButton = document.createElement("button");
+    closeButton.textContent = "Close";
+    closeButton.onclick = function() {
+        document.body.removeChild(dialog);
+    };
+    dialog.appendChild(closeButton);
+
+    document.body.appendChild(dialog);
+}
+
+// Usage Example
+showDialog("Dialog Title", "This is a dialog message");
+
+</script>
+<!--recording-->
+<script>
+let mediaRecorder; // Single declaration
+let audioChunks = [];
+let screenStream;
+let audioStream;
+let shouldRecord = false; // Global variable to hold the toggle state
+
+document.getElementById('rectoggle').addEventListener('change', function() {
+    shouldRecord = this.checked; // Update the variable based on the toggle state
+});
+
+function startScreenRecording() {
+        navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(audio => {
+            audioStream = audio;
+            let tracks = [...screen.getTracks(), ...audio.getTracks()];
+            mediaRecorder = new MediaRecorder(new MediaStream(tracks));
+            audioChunks = [];
+
+            mediaRecorder.addEventListener("dataavailable", event => {
+                audioChunks.push(event.data);
+            });
+
+            mediaRecorder.start();
+        });
+}
+
+function stopScreenRecording() {
+    mediaRecorder.stop();
+    audioStream.getTracks().forEach(track => track.stop());
+    mediaRecorder.addEventListener("stop", () => {
+        const recordingBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+        const recordingUrl = URL.createObjectURL(recordingBlob);
+        const a = document.createElement("a");
+        document.body.appendChild(a);
+        a.style = "display: none";
+        a.href = recordingUrl;
+        a.download = 'recording.mp3';
+        a.click();
+        window.URL.revokeObjectURL(recordingUrl);
+    });
+}
+
+
+document.getElementById('stopAndClose').addEventListener('click', function() {
+    console.log("executed stop and close")
+    stopScreenRecording();
+    window.close();
+});
+
+</script>
+<!--avatar load stuff and toggling-->
+<script>
+const avatarthing = document.getElementById('avatar');
+avatarthing.style.display = 'none';
+
+document.getElementById('avatartu').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = document.getElementById('avatart');
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+});
+document.getElementById('avatarfu').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = document.getElementById('avatarf');
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+const avatart = document.getElementById('avatart');
+const avatarf = document.getElementById('avatarf');
+
+document.getElementById('endedit').addEventListener('click', function() {
+    document.querySelector('.container').style.display = 'none';
+    document.getElementById('avatar').style.display = 'block';
+    if (shouldRecord) {
+        startScreenRecording();
+    }
+    // Request the browser to go fullscreen on the avatar element
+    if (avatarthing.requestFullscreen) {
+        avatarthing.requestFullscreen();
+    } else if (avatarthing.mozRequestFullScreen) { /* Firefox */
+        avatarthing.mozRequestFullScreen();
+    } else if (avatarthing.webkitRequestFullscreen) { /* Chrome, Safari, and Opera */
+        avatarthing.webkitRequestFullscreen();
+    } else if (avatarthing.msRequestFullscreen) { /* IE/Edge */
+        avatarthing.msRequestFullscreen();
+    }
+
+});
+</script>
+<!--main code-->
+<script>
+let talking = false;
+let audioContext;
+let analyser;
+let microphone;
+let volumeThreshold = 50;
+let audioDataArray;
+let rafId;
+
+document.getElementById('volumeThreshold').addEventListener('input', function() {
+    volumeThreshold = this.value/100;
+});
+
+document.getElementById('vtstatus').textContent = 'volumeThreshold';
+
+
+function startAudio() {
+    if (!navigator.mediaDevices) {
+        console.log('mediaDevices not supported');
+        return;
+    }
+
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+        .then(stream => {
+            microphone = audioContext.createMediaStreamSource(stream);
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 2048;
+            audioDataArray = new Uint8Array(analyser.frequencyBinCount);
+            microphone.connect(analyser);
+            analyzeAudio();
+        })
+        .catch(err => {
+            console.log('Error accessing microphone', err);
+        });
+}
+
+function analyzeAudio() {
+    analyser.getByteTimeDomainData(audioDataArray);
+    let sum = 0;
+    let average = 0;
+
+    for (let i = 0; i < audioDataArray.length; i++) {
+        let sample = audioDataArray[i];
+        let x = (sample / 128.0) - 1; // Normalize sample to [-1, 1]
+        sum += x * x;
+    }
+
+    average = Math.sqrt(sum / audioDataArray.length);
+    let volume = average * 100; // Scale volume for easier threshold comparison
+
+    document.getElementById('volumeOutput').textContent = 'Volume: ' + volume.toFixed(2);
+
+    let newTalkingState = (volume > volumeThreshold);
+
+    if (newTalkingState !== talking) {
+        talking = newTalkingState;
+        document.getElementById('talkingStatus').textContent = talking ? 'Talking' : 'Not Talking';
+    }
+    if (talking) {
+        avatart.style.display = 'block';
+        avatarf.style.display = 'none';
+    } else {
+        avatart.style.display = 'none';
+        avatarf.style.display = 'block';
+    }
+    rafId = requestAnimationFrame(analyzeAudio);
+}
+
+
+// Ensure to stop the animation frame and close the audio context when not needed
+function stopAudioAnalysis() {
+    cancelAnimationFrame(rafId);
+    if (audioContext) {
+        audioContext.close();
+    }
+}
+</script>
+</body>
+</html>

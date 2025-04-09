@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Random Colored Boxes with Dithering</title>
+  <style>
+    img {
+      border: 1px solid #000;
+      cursor: pointer;
+      display: block;
+      margin: 10px 0;
+    }
+    .canvas-container {
+      display: flex;
+      flex-wrap: wrap;
+    }
+    canvas {
+      border: 1px solid #ccc;
+      margin: 5px;
+    }
+  </style>
+</head>
+<body>
+  <input type="file" id="imageInput" accept="image/*" multiple>
+  <label>
+    <input type="checkbox" id="ditheringToggle"> Dithering
+  </label>
+  <br>
+  <div class="canvas-container" id="canvasContainer"></div>
+  <a id="downloadZipLink" style="display: none;">Download All Images as ZIP</a>
+  <div id="imageLoadedPercent">0% images processed</div>
+  <div id="imageLoadedAmount">0/0 images processed</div>
+
+  <script>
+document.addEventListener("DOMContentLoaded", function () {
+  const canvasContainer = document.getElementById('canvasContainer');
+  const colors = [
+    [0, 0, 0], [1, 1, 1], [0.3294, 0.3294, 0.3294], [0.7725, 0.7725, 0.7725],
+    [0.8039, 0.7882, 0.7843], [0.8824, 0.8275, 0.8235], [0.2078, 1, 0.2078],
+    [0, 0.6667, 0], [0.1529, 0.6235, 0.2118], [0.2078, 1, 1],
+    [0.1725, 0.7255, 0.6588], [0, 0.6667, 0.6667], [0, 0, 0.6667],
+    [0.3216, 0.3294, 0.9961], [0.6039, 0.3647, 0.7725], [0.6667, 0, 0.6667],
+    [0.8, 0.2824, 0.3059], [1, 0.3294, 1], [1, 0.6667, 0],
+    [0.8745, 0.6902, 0.1725], [0.9333, 0.8118, 0.0588], [1, 1, 0.3294],
+    [0.7412, 0.0235, 0.0275], [0.6667, 0, 0], [0.9961, 0.3294, 0.3294],
+    [0.7216, 0.4078, 0.3059], [0.2667, 0.2235, 0.2314]
+  ];
+  let processedImages = 0;
+  const imageInput = document.getElementById('imageInput');
+  const ditheringToggle = document.getElementById('ditheringToggle');
+  const downloadZipLink = document.getElementById('downloadZipLink');
+
+  imageInput.addEventListener('change', handleImages);
+
+async function handleImages(event) {
+  const files = event.target.files;
+  const totalImages = files.length;
+  canvasContainer.innerHTML = ''; // Clear previous canvases
+    for (const file of files) {
+      const img = await loadImage(file);
+      const processedImage = processImage(img);
+      const imageDataUrl = processedImage.toDataURL();
+      // Create a preview image
+      const imgElement = document.createElement('img');
+      imgElement.src = imageDataUrl;
+      canvasContainer.appendChild(imgElement);
+      // Create a download link for each image
+      const downloadLink = document.createElement('a');
+      downloadLink.href = imageDataUrl;
+      downloadLink.download = file.name.split('.')[0] + '_processed.png';
+      downloadLink.textContent = 'Download ' + file.name;
+      canvasContainer.appendChild(downloadLink);
+      canvasContainer.appendChild(document.createElement('br'));
+      // Update progress
+      processedImages++;
+      updateProgress(processedImages, totalImages);
+    }
+}
+  function loadImage(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.src = e.target.result;
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function processImage(img) {
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    canvas.width = img.width;
+    canvas.height = img.height;
+  
+    context.drawImage(img, 0, 0);
+    const data = context.getImageData(0, 0, img.width, img.height).data;
+  
+    const blockColors = new Array(canvas.width * canvas.height);
+    const errorMatrix = new Float32Array(canvas.width * canvas.height * 3);
+  
+    for (let y = 0; y < canvas.height; y++) {
+      for (let x = 0; x < canvas.width; x++) {
+        const pixelIndex = (y * canvas.width + x) * 4;
+        const originalColor = [
+          data[pixelIndex] / 255,
+          data[pixelIndex + 1] / 255,
+          data[pixelIndex + 2] / 255,
+        ];
+        
+        let alpha = data[pixelIndex + 3] / 255; // Alpha channel (0 to 1)
+        if (alpha > 0) {
+          alpha = 1; // Make any transparency > 0% fully opaque
+        }
+  
+        // Replace the alpha channel with 1 (100% opacity)
+        data[pixelIndex + 3] = 255; // Set to 100% opacity
+  
+        const errorOffset = (y * canvas.width + x) * 3;
+        const adjustedColor = [
+          Math.min(Math.max(originalColor[0] + errorMatrix[errorOffset], 0), 1),
+          Math.min(Math.max(originalColor[1] + errorMatrix[errorOffset + 1], 0), 1),
+          Math.min(Math.max(originalColor[2] + errorMatrix[errorOffset + 2], 0), 1),
+        ];
+  
+        const snappedColor = snapToAvailableColors(adjustedColor);
+        blockColors[y * canvas.width + x] = snappedColor;
+  
+        if (ditheringToggle.checked) {
+          const ditheringError = [
+            originalColor[0] - snappedColor[0],
+            originalColor[1] - snappedColor[1],
+            originalColor[2] - snappedColor[2],
+          ];
+  
+          distributeErrorFloydSteinberg(ditheringError, x, y, errorMatrix, canvas.width, canvas.height);
+        }
+      }
+    }
+  
+    drawBlocks(blockColors, context, canvas);
+    return canvas; // Return the processed canvas
+  }
+
+  function drawBlocks(blockColors, context, canvas) {
+    const imageData = context.createImageData(canvas.width, canvas.height);
+
+    for (let blockIndex = 0; blockIndex < blockColors.length; blockIndex++) {
+      const x = (blockIndex % canvas.width);
+      const y = Math.floor(blockIndex / canvas.width);
+      const [red, green, blue] = blockColors[blockIndex].map(value => Math.round(value * 255));
+
+      const pixelIndex = (y * canvas.width + x) * 4;
+      imageData.data[pixelIndex] = red;
+      imageData.data[pixelIndex + 1] = green;
+      imageData.data[pixelIndex + 2] = blue;
+      imageData.data[pixelIndex + 3] = 255; // Alpha channel
+    }
+
+    context.putImageData(imageData, 0, 0);
+  }
+
+  function snapToAvailableColors(color) {
+    return colors.reduce((prev, curr) => {
+      const prevDist = colorDistanceSquared(color, prev);
+      const currDist = colorDistanceSquared(color, curr);
+      return prevDist < currDist ? prev : curr;
+    });
+  }
+
+  function colorDistanceSquared(color1, color2) {
+    return (
+      Math.pow(color1[0] - color2[0], 2) +
+      Math.pow(color1[1] - color2[1], 2) +
+      Math.pow(color1[2] - color2[2], 2)
+    );
+  }
+
+  function distributeErrorFloydSteinberg(error, x, y, errorMatrix, width, height) {
+    const pixelIndex = (y * width + x) * 3;
+
+    if (x + 1 < width) {
+      addErrorToPixel(error, pixelIndex + 3, errorMatrix, width, height);
+    }
+    if (x - 1 >= 0 && y + 1 < height) {
+      addErrorToPixel(error, pixelIndex - 3 + width * 3, errorMatrix, width, height);
+    }
+    if (y + 1 < height) {
+      addErrorToPixel(error, pixelIndex + width * 3, errorMatrix, width, height);
+    }
+  }
+
+  function addErrorToPixel(error, targetPixelIndex, errorMatrix, width, height) {
+    const [errorR, errorG, errorB] = error;
+
+    errorMatrix[targetPixelIndex] += errorR * 7 / 16;
+    errorMatrix[targetPixelIndex + 1] += errorG * 7 / 16;
+    errorMatrix[targetPixelIndex + 2] += errorB * 7 / 16;
+  }
+
+  function updateProgress(processed, total) {
+    document.getElementById('imageLoadedPercent').textContent = `${Math.round((processed / total) * 100)}% images processed`;
+    document.getElementById('imageLoadedAmount').textContent = `${processed}/${total} images processed`;
+  }
+
+  function resetProgress() {
+    processedImages = 0;
+    document.getElementById('imageLoadedPercent').textContent = '0% images processed';
+    document.getElementById('imageLoadedAmount').textContent = '0/0 images processed';
+  }
+});
+  </script>
+</body>
+</html>
