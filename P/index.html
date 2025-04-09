@@ -38,38 +38,7 @@ body {
         transform-origin: top left;
     }
 }*/
-.taskbar {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    background-color: #444;
-    height: 40px;
-    padding: 5px;
-    gap: 10px;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-}
 
-.taskbar .task {
-    display: flex;
-    align-items: center;
-    background-color: #333;
-    padding: 5px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-.taskbar .task:hover {
-    background-color: #555;
-}
-
-.taskbar .task img {
-    width: 20px;
-    height: 20px;
-    margin-right: 5px;
-}
 
 /* Quick Settings - Bottom right */
 .quick-settings {
@@ -198,7 +167,7 @@ let firstClick = true;
 });*/
     let zIndex = 1;
     let openWindows = [];
-    document.body.appendChild(taskbar);
+
 
     // Quick settings panel
     let quickSettings = document.createElement('div');
@@ -392,8 +361,6 @@ function toggleFullscreen() {
     }
 
     function closeWindow(windowDiv, processId) {
-        const taskbarItem = document.querySelector(`.task[data-processid="${processId}"]`);
-        if (taskbarItem) taskbar.removeChild(taskbarItem);
         document.body.removeChild(windowDiv);
         processManager.updateProcess(processId, { background: true });
     }
