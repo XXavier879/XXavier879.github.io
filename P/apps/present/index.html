@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trabajo Tecnología - Solución al Problema de Botellas en las Calles</title>
+  
+  <style>
+@font-face {
+    font-family: mccnormal;
+    src: url('fonts/Minecraft-Seven.otf'); 
+}
+@font-face {
+    font-family: mcctitle;
+    src: url('fonts/Minecraft-Ten.otf'); 
+}
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #11cccc;
+    }
+.slide {
+  display: none;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+  background-color:#474849;
+}
+.active {
+  display: flex;
+  opacity: 1;
+}
+    #diapo2 {
+      text-align: left;
+    }
+    #title01 {
+      color: #226666;
+    }
+    #imgdiapo2 {
+      width: 256px;
+    }
+    #settings-btn {  
+      position: absolute;  
+      top: 10px;  
+      left: 10px;  
+      width: 16px;  
+      height: 16px;  
+      background-color: grey;  
+      border: 1px solid #555;  
+      image-rendering: pixelated;  
+      cursor: pointer;  
+    }  
+    #settings-window {  
+      display: none;  
+      position: absolute;  
+      top: 30px;  
+      left: 10px;  
+      background-color: white;  
+      border: 1px solid #555;  
+      padding: 10px;  
+      font-size: 12px;  
+    }  
+    #diapo7 {
+      background-color: #000000;
+      color:#ffffff;
+    }
+    .diapo7.title {
+      font-family: mcctitle;
+    }
+    .diapo7.text {
+      font-family: mccnormal;
+    }
+    #restart-btn {
+      font-family: mccnormal;
+      border:0;
+      border-color: #000000;
+      color: inherit;
+      margin:inherit;
+      padding:inherit;
+      background-color:inherit;
+    }
+  </style>
+  <link rel="stylesheet" href="basic.css" type="text/css" media="all" />
+</head>
+<body>
+
+  <div id="diapo1" class="slide active">
+    <div class="column">
+      
+    <h1 class="title">El problema con la basura de alcohólicos en la calle y la contaminacion acustica</h1>
+    <div class="label">Y la solución a estos   (imagenes de ejemplo)</div>
+    </div>
+  </div>
+
+  <div id="diapo2" class="slide">
+    
+<div class="row">
+  <img class="image" id="imgdiapo2" src="DSC_1250-scaled.jpg" alt="" />
+  <div class="column">
+    <div class="title">
+      El problema
+    </div>
+    <div class="label">
+      esto es nuestro caso de una comunidad con problemas
+    </div>
+    <div class="label">
+      Como se puede ver, hay botellas, y una botilleria la cual causa que venga gente con musica en alto volumen
+    </div>
+    <div class="label">
+      Esto hace mucho ruido y ademas los que vienen pueden ser alcoholicos que tiran sus botellas y/o hacen ruido
+    </div>
+  </div>
+</div>
+  </div>
+
+  <div id="diapo3" class="slide">
+<div class="column">
+    <div class="title">
+      La importancia de una solucion
+    </div>
+    <div class="label">
+      Es necesario ya que necesitamos mas calma en las calles y para no terminar pisando vidrios rotos
+    </div>
+    <div class="label">
+      o que encontrempos lugares orinados por borrachos, ademas de que este limpias
+    </div>
+</div>
+  </div>
+  <div id="diapo4" class="slide">
+    <div class="column">
+    <div class="title">
+      Mi idea de solucion
+    </div>
+    <div class="label">
+      Como yo se que estos problemas no son solo en mi barrio
+    </div>
+    <div class="label">
+      pues pienso que se podria hacer algo para el problema del ruido
+    </div>
+    <div class="label">
+      y algo para la limpieza
+    </div>
+    </div>
+  </div>
+  <div id="diapo5" class="slide">
+<div class="row">
+  <img class="image" id="imgdiapo2" src="reg01.jpeg" alt="" />
+  <div class="column">
+    <div class="title">
+      Soluciones existentes
+    </div>
+    <div class="label">
+      Para el problema de el ruido existe un dispositivo llamado "reggaeton be gone"
+    </div>
+    <div class="label">
+      este dispositivo detecta reggaeton y empieza a atacar las señales bluetooth para pararlo
+    </div>
+    <div class="label">
+      pero este interrumpe la señal causando que los parlantes agenos puedan hacer peores ruidos por los errores de conectividad, y causar daños en propiedad, ademas esta hecho para reggaeton
+    </div>
+    <div class="label">
+      Y pues para la limpieza con simplemente limpiar es con lo que avanzan
+    </div>
+  </div>
+</div>
+  </div>
+  <div id="diapo6" class="slide">
+<div class="row">
+  <img class="image" id="imgdiapo2" src="DSC_1250-scaled.jpg" alt="" />
+  <div class="column">
+    <div class="title">
+      Mi solucion(o mis soluciones)
+    </div>
+    <div class="label">
+      #1: Un dispositivo que contrareste el audio de alto volumen usando cancelacion de ruido activa, esto hara que el volumen ondule(limitacion y hacer que no quieran escuchar mas musica
+    </div>
+    <div class="label">
+      #2: Un servicio que limpie calles de alta concurrencia mas seguido
+    </div>
+  </div>
+</div>
+  </div>
+  <iframe src="./credits.html" frameborder="0" id="diapo7" class="slide"></iframe>
+  <div id="settings-btn"></div>  
+  <div id="settings-window">Ajustes, no me dieron ganas hacerlos</div>
+  <script>
+    let slides = document.querySelectorAll(".slide");
+    let currentSlide = 0;
+
+function showSlide(index) {
+  slides.forEach((slide, i) => {
+    if (i === index) {
+      slide.style.display = "flex"; // Show immediately
+      setTimeout(() => {
+        slide.style.opacity = "1"; // Fade in after display is set
+      }, 10); // Small delay to trigger transition
+    } else {
+      slide.style.opacity = "0"; // Start fading out
+      setTimeout(() => {
+        slide.style.display = "none"; // Hide after fade out
+      }, 500); // Wait for transition (matches CSS duration)
+    }
+  });
+}
+
+    document.body.addEventListener("click", (event) => {
+      let midScreen = window.innerWidth / 2;
+      if (event.clientX > midScreen) {
+        currentSlide = (currentSlide + 1) % slides.length;
+      } else {
+        currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+      }
+      showSlide(currentSlide);
+    });
+    document.getElementById("settings-btn").addEventListener("click", (event) => {  
+      event.stopPropagation();  
+      let settingsWindow = document.getElementById("settings-window");  
+      settingsWindow.style.display = settingsWindow.style.display === "block" ? "none" : "block";  
+    });  
+  </script>
+
+</body>
+</html>

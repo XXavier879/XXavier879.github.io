@@ -1,0 +1,88 @@
+* {
+    margin:0;
+    padding:0;
+}
+@font-face {
+    font-family: mctitle;
+    src: url('fonts/Cocogoose-Narrow-Letterpress-trial.ttf'); 
+}
+@font-face {
+    font-family: mcnormal;
+    src: url('fonts/Minecraft-Seven.otf'); 
+}
+@font-face {
+    font-family: mcsmall;
+    src: url('fonts/Roboto-Regular.ttf'); 
+}@font-face {
+    font-family: mcsmalltick;
+    src: url('fonts/Minecraft-Five-Bold.otf'); 
+}
+body {
+  background-color: #474849;
+  font-family: mcnormal;
+}
+.header {
+  background-color: #343434;
+  color: white;
+  font-family: mcnormal;
+  height: 26px;
+  width: 100%;
+}
+.title {
+    font-family: mctitle;
+    font-size: 24px;
+    font-palette: #ffffff;
+    color: #ffffff;
+}
+.text {
+    font-family: mcnormal;
+    font-size: 16px;
+    font-palette: #ffffff;
+    color: #ffffff;
+}
+.link {
+    font-family: mcsmall;
+    font-size: 16px;
+    font-palette: #00ffff;
+    color: #00ffff;
+}
+.row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.column {
+  display: flex;
+  flex-direction: column;
+  margin: 10px;
+}
+.row.top {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+.navitem {
+    background-color: #343434;
+    cursor: pointer;
+    color: white;
+    text-align: center;
+    transition: background-color 0.3s ease; 
+    flex: 1; )
+    padding: 10px 0px;
+}
+.navitem:hover {
+    background-color: #555555;
+}
+.post {
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 5px solid #343434;
+    background-color: #141414;
+    color: #cecece;
+}
+.label {
+    font-family: mcsmall;
+    font-size: 16px;
+    font-palette: #ffffff;
+    color: #ffffff;
+}

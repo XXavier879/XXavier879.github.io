@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Créditos</title>
+  <style>
+    @font-face {
+      font-family: mccnormal;
+      src: url('fonts/Minecraft-Seven.otf');
+    }
+
+    body {
+      margin: 0;
+      background-image: url('./background.png');
+      background-repeat: repeat;
+      image-rendering: pixelated;
+      background-size: 128px;
+      color: white;
+      font-family: mccnormal;
+      overflow: hidden;
+      position: relative;
+    }
+
+    body::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, black 0%, rgba(0, 0, 0, 0.5) 15%, rgba(0, 0, 0, 0.5) 85%, black 100%);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .credits-container {
+      position: relative;
+      height: 100vh;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .credits {
+      position: absolute;
+      width: 100%;
+      font-family: mccnormal;
+      white-space: pre-line;
+      text-align: left;
+      font-size: 18px;
+      line-height: 1.6em;
+      z-index: 2;
+      animation: scrollCredits 75s linear forwards;
+      padding: 0 20px;
+    }
+
+    @keyframes scrollCredits {
+      0% {
+        top: 100%;
+      }
+      100% {
+        top: -200%;
+      }
+    }
+    pre {
+      font-family: mccnormal;
+    }
+  </style>
+</head>
+<body>
+
+<div class="credits-container">
+  <div class="credits">
+<pre>
+Créditos:
+
+Diseño de la presentación:
+Xavier Rojas
+
+Tipografías:
+Minecraft Seven => Mojang Studios AB
+Cocogoose Narrow => Zetafonts
+
+Fuentes de imágenes de la presentación:
+Minecraft (1.18.0, OSBES shaders)
+Google (fuente original desconocida)
+
+Programador principal:
+Xavier Rojas
+
+Ayudante:
+ChatGPT (no para todo)
+
+Investigadores:
+Xavier Rojas
+(no se usó ChatGPT para búsqueda de información)
+
+Fuentes de información:
+Lo que se, y unas búsquedas en Google
+
+
+Nombre: Xavier Rojas
+Curso: 1⁰MA
+</pre>
+    <div class="creditsoverlay"></div>
+  </div>
+</div>
+
+</body>
+</html>
