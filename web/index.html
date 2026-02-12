@@ -3,117 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reflexión</title>
     <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-primary: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --accent-soft: #eef2f3;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: #f9f9f9;
-            padding: 20px;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.8;
+            margin: 0;
             display: flex;
+            align-items: center;
             justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
         }
-        .container {
-            background-color: #ffffff;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            max-width: 700px;
+
+        .content-card {
+            max-width: 550px;
             width: 100%;
+            padding: 40px;
+            border-left: 1px solid #eee; /* A subtle line indicating a quiet space */
         }
-        p {
-            margin-bottom: 15px;
-            white-space: pre-wrap; /* Mantiene los saltos de línea */
+
+        .stanza {
+            margin-bottom: 30px;
+            white-space: pre-wrap;
         }
-        .quote {
+
+        .apology {
+            font-size: 1.1em;
+            letter-spacing: 0.5px;
+        }
+
+        .consequence {
+            color: var(--text-secondary);
             font-style: italic;
-            color: #555;
-            border-left: 3px solid #ccc;
-            padding-left: 15px;
-            margin: 20px 0;
         }
-        .list-section {
-            margin-left: 20px;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-        .highlight {
-            color: #d9534f;
-            font-weight: bold;
-        }
-        hr {
-            border: 0;
-            border-top: 1px solid #eee;
-            margin: 30px 0;
-        }
-        .footer-note {
-            font-size: 0.9em;
-            color: #888;
+
+        .truth {
+            border-top: 1px solid var(--accent-soft);
+            padding-top: 25px;
             margin-top: 40px;
-            border-top: 1px solid #eee;
-            padding-top: 10px;
+            font-weight: 400;
+        }
+
+        .highlight {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .footer {
+            margin-top: 60px;
+            font-size: 0.8em;
+            color: #bdc3c7;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Mobile optimization */
+        @media (max-width: 480px) {
+            .content-card {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <p>No me hables de esto, solo decide si me llevas o no.</p>
-    
-    <div class="quote">"Es por tu propia salud"...</div>
-    
-    <p>Me rompe por dentro e intento decírtelo, pero tú solo dices eso.<br>
-    Apenas puedo expresar cómo me siento y sufro durante días para que tú digas eso.<br>
-    Lo odio, y cada vez que sé que viene, me siento peor.<br>
-    Cada vez que lo digo, dices "voy a estar allí contigo".</p>
-
-    <p>¿Alguna vez ha funcionado?<br>
-    Solo porque me preguntaste si estaba bien y dije "sí"...<br>
-    ¿De verdad me crees por mis palabras... pero me ignoras por mis sentimientos?<br>
-    Estar conmigo solo hizo que el momento se sintiera menos mal, pero el antes y el después no cambian.<br>
-    Se sentirá mal y a este punto no sé qué voy a hacer...<br>
-    Solo me deseo la muerte a mí y a ti un buen día.</p>
-
-    <p>Después de años... siento que solo recibo las necesidades más básicas:</p>
-    <div class="list-section">
-        • Comida<br>
-        • Agua<br>
-        • Ropa<br>
-        • Y una cama
+<div class="content-card">
+    <div class="stanza apology">
+        Perdon
+        Disculpa
+        No queria hacerte sufrir
+        No queria hacerte sentir mal
     </div>
-    <p>Con algunos extras en el camino.</p>
 
-    <p>Sí, es suficiente. Y lo devuelvo haciendo recados.<br>
-    Pero <strong>no debería tener que pagar con mi cordura</strong>.<br>
-    No debería tener que pagar con mi capacidad de sentir (¿hablo o río a menudo?, ¿lloro cuando me siento triste?).<br>
-    No debería tener que pagar con mi forma de ver mi valor (pienso que no valgo lo suficiente ni para tener mi propio dinero, ya que se lo doy a mi hermana sintiendo que ella sí vale la pena).<br>
-    No debería tener que pagar con mi vida (el miedo me hizo desear la muerte... la presión del masking autista fue solo la base de ello).</p>
+    <div class="stanza consequence">
+        Eso lo escribi en una noche con sueño
+        Quien escribe bien en una noche
+        Disculpame
+    </div>
 
-    <hr>
+    <div class="stanza">
+        Que simplemente con cada mala cosa que dije
+        Los resultados de mis palabras me hacen sentir aun peor
+        Como ya sientes que no me puedes pedir cosas
+        Como ya sientes que no me puedes hablar
+    </div>
 
-    <p>No es obligatorio, no es la parte más importante (un análisis de sangre puede no hacerse... mi mamá solo... quiere que se hagan todos los análisis).<br>
-    Son solo 5 números de datos. De otros 40 más (sí, tienen muchos otros datos y realmente podrían usar los datos de otras cosas para saber lo que necesitan de mi sangre).</p>
+    <div class="stanza truth">
+        De lo unico que no me arrepiento
+        Es de odiar a mi mama
+        <span class="highlight">Pero incluso si la odio
+        La quiero cuando actua bien</span>
+    </div>
 
-    <p class="highlight">Es un análisis de sangre. Lo odio.</p>
-
-    <p>¿Realmente valen 5 números 10 días de pérdida de cordura? (He estado teniendo crisis/meltdowns durante días).<br>
-    ¿Realmente valen 5 números mi odio y mi depresión? (Empecé a odiarte con el tiempo y me hace sentir como la mala persona).<br>
-    ¿Realmente valen tanto esos 5 números que dices "es por tu propia salud" como si fueran los únicos válidos? (Recuerda...).</p>
-
-    <p>ESTOY exagerando al sentirme así (ser autista hace que los sentimientos y las cosas se sientan peor).<br>
-    Pero también lo haces tú al pensar que es por mi bien (sí, un análisis de sangre realmente curará todas las enfermedades).<br>
-    Si se veía que empeoraba con el tiempo (como cuando era niño y literalmente no me importaba, y ahora digo esto), ¿no te diste cuenta?<br>
-    ¿O pensaste que me sentiría bien con ello?</p>
-
-    <p>¿Realmente importa más tu miedo al enojo de mi mamá que los traumas que me genera esto? (Sé que mi mamá da mucho miedo cuando está enojada, pero estoy dispuesto a defenderte en esto tanto como pueda, incluso por llamadas).</p>
-    
-    <p>Odio decirlo, pero con mi pérdida de cordura, mi amor se convirtió en odio (ahora los odio a ambos, a mi hermana y a mi mamá, lo siento) y mi cuidado por ti se convirtió en tortura masoquista... (me importas hasta el punto en que dejé de preocuparme por mí y solo me importaron tus sentimientos).<br>
-    Me importaba todo y todos a mi alrededor... pero nunca yo mismo (rasgo autista común...).<br>
-    Ahora que intento hablar para darme un respiro... solo dices que es por mi salud...<br>
-    A este punto, si lo midieran, mi cortisol es literalmente peligroso.</p>
-
-    <div class="footer-note">
-        Escribí esto en inglés... No me preguntes. Y esto fue traducido con IA para tu conocimiento.
+    <div class="footer">
+        Escrito a mano • Sin IA
     </div>
 </div>
 
