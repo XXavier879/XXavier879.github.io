@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Cronos</title>
+<link rel="stylesheet" href="../shared/style.css">
+</head><body>
+<canvas id="game"></canvas>
+<canvas id="native-ui"></canvas>
+<div id="hud">
+  <span class="pill" id="hp"></span><span class="pill" id="pr"></span><span class="pill" id="pt"></span>
+  <span class="sp"></span>
+  <a class="hb" href="../index.html" style="text-decoration:none;display:flex;align-items:center" title="Menú">🏠</a><button class="hb" id="bNext">🧭<span class="lbl"> Siguiente reto</span></button><button class="hb" id="bFs">⛶</button><button class="hb" id="bSnd">🔊</button>
+</div>
+<div id="zone"></div>
+<div id="hint">👆 Toca el mapa para caminar · ❗ Toca un personaje para su reto</div>
+<div id="modal"><div id="box"></div></div>
+<!-- orden: errors -> input -> engine -> state -> helpers -> config -> mapa -> core -->
+<script src="../shared/errors.js"></script>
+<script src="../shared/input.js"></script>
+<script src="../shared/engine.js"></script>
+<script src="../shared/state.js"></script>
+<script src="../shared/helpers.js"></script>
+<script src="../config.js"></script>
+<script src="map.js"></script>
+<script src="../shared/core.js"></script>
+</body></html>
